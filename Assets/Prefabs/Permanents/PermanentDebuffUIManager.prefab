@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2314835172267849402
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5652926702315168259}
+  - component: {fileID: 9187925021952448332}
+  m_Layer: 0
+  m_Name: PermanentDebuffUIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5652926702315168259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2314835172267849402}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 320, y: 240, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9187925021952448332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2314835172267849402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe2ea2b442ea2764ba644889aad9a06e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DeBuffUI
+  _uiParent: {fileID: 2203907732283572988, guid: 79d67ffd3b3002041bd02f4060b244bc, type: 3}
+  _UIList:
+  - {fileID: 6757675097334010611, guid: 79d67ffd3b3002041bd02f4060b244bc, type: 3}
+  - {fileID: 5435551565114788369, guid: 79d67ffd3b3002041bd02f4060b244bc, type: 3}
+  - {fileID: 226492103078173161, guid: 79d67ffd3b3002041bd02f4060b244bc, type: 3}
+  - {fileID: 197938369642884104, guid: 79d67ffd3b3002041bd02f4060b244bc, type: 3}
+  m_debuffList: []
+  RemoveList: []
+  _PlayerDeBuffAll: {fileID: 11400000, guid: 58759238773d93045a8d394fc85dae24, type: 2}
+  _ShopDeBuffAll: {fileID: 11400000, guid: ad729691a3a2ad342ab9de69633d0ffd, type: 2}
+  _DebuffUI: {fileID: 7476547491831049803, guid: 79d67ffd3b3002041bd02f4060b244bc, type: 3}
+  _BuffUI: {fileID: 2801624989855633594, guid: 6b6a3e558dc2bfc4583c7dd030d9cc42, type: 3}
+  _BuffManager: {fileID: 3104857268098569573, guid: 98814a1e6c3b1f549a462b9cbd05f640, type: 3}
+  m_reRollCountMax: 3
+  m_reRollButton: {fileID: 0}
+  m_Credit: {fileID: 11400000, guid: c2d57c8b3f936ff499fe4cec3960e4b1, type: 2}
+  _CreditMaster: {fileID: 11400000, guid: 4d49922548a47454890f92aad59a51d9, type: 2}
+  _SelectUI: {fileID: 0}

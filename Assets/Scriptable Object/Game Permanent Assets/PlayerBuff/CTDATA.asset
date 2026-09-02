@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa1f43c707d81e6488c2f9912c3b3953, type: 3}
+  m_Name: CTDATA
+  m_EditorClassIdentifier: Assembly-CSharp::PermanentPlayerBuff
+  m_BuffName: CTData
+  m_BuffTips: "\u901A\u5E38\u653B\u6483\u306E\u901F\u5EA6\u3092\u5411\u4E0A\u3055\u305B\u308B"
+  m_GainLv: 2
+  m_GainCost: 30
+  m_BuffValueInt: 0
+  m_BuffValueFloat: 0.5

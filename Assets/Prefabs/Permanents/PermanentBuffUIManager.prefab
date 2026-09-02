@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3104857268098569573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6984012420679446884}
+  - component: {fileID: 3446013629682970241}
+  m_Layer: 0
+  m_Name: PermanentBuffUIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &6984012420679446884
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3104857268098569573}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 320, y: 240, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3446013629682970241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3104857268098569573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9448019ca4c236b4f89c12aa4f74b832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PermanentBuffManager
+  _uiParent: {fileID: 2629113593897388854, guid: 6b6a3e558dc2bfc4583c7dd030d9cc42, type: 3}
+  _UIList:
+  - {fileID: 7206268202669879180, guid: 6b6a3e558dc2bfc4583c7dd030d9cc42, type: 3}
+  - {fileID: 2773321478624143709, guid: 6b6a3e558dc2bfc4583c7dd030d9cc42, type: 3}
+  - {fileID: 3134063312334611464, guid: 6b6a3e558dc2bfc4583c7dd030d9cc42, type: 3}
+  - {fileID: 3406431630710729839, guid: 6b6a3e558dc2bfc4583c7dd030d9cc42, type: 3}
+  m_buffList:
+  - m_isUseData: 0
+    m_buff: {fileID: 0}
+  RemoveList:
+  - m_isUseData: 0
+    m_buff: {fileID: 0}
+  _PlayerBuffAll: {fileID: 11400000, guid: f06859053928a914fb26f83288b8d60f, type: 2}
+  _ShopBuffAll: {fileID: 11400000, guid: ec04bff2a1c2bca49980cd65106948aa, type: 2}
+  _BuffUI: {fileID: 2801624989855633594, guid: 6b6a3e558dc2bfc4583c7dd030d9cc42, type: 3}
+  m_reRollCountMax: 1
+  m_reRollButton: {fileID: 0}
+  m_Credit: {fileID: 11400000, guid: b1634a76a9ffee44698dbd92bf058a92, type: 2}
+  _CreditMaster: {fileID: 11400000, guid: 4d49922548a47454890f92aad59a51d9, type: 2}
+  _SelectUI: {fileID: 0}

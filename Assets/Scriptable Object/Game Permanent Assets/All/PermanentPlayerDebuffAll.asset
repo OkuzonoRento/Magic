@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ed7f3c195f5b0e4fa11737d68685069, type: 3}
+  m_Name: PermanentPlayerDebuffAll
+  m_EditorClassIdentifier: Assembly-CSharp::PermanentPlayerDebuffAll
+  PlayerDebuffs:
+  - m_isUseData: 1
+    m_debuff: {fileID: 11400000, guid: 31773188b5b5c274caab502c4ab42c35, type: 2}
+  - m_isUseData: 1
+    m_debuff: {fileID: 11400000, guid: e3f52bb09393651478a449e9c58c9f60, type: 2}
+  - m_isUseData: 1
+    m_debuff: {fileID: 11400000, guid: ce056d9342f79ea42a9d4f0279ea7542, type: 2}
+  - m_isUseData: 1
+    m_debuff: {fileID: 11400000, guid: 57ba872d25004024c8a2981251a7dfac, type: 2}
+  PermanentCredit: 354600
