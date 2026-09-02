@@ -5,6 +5,8 @@ using TMPro;
 public class ShopSceneManager : MonoBehaviour
 {
     [SerializeField] private SellSlotController _selectItem;
+    [SerializeField] private BuySlotController _buySlot; // ← 追加
+
     [Header("Scriptable Object")]
     [SerializeField] private Inventory _inventoryBase;
     [SerializeField] private ShopTable _shopTableBase;
@@ -23,7 +25,7 @@ public class ShopSceneManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _shopButtonText;
     [SerializeField] private GameObject[] _shopTableObject = new GameObject[3];
     [SerializeField] private TextMeshProUGUI[] _shopTableText = new TextMeshProUGUI[3];
-    [System.NonSerialized]public MagicBaseData[] _shopTable = new MagicBaseData[3];
+    [System.NonSerialized] public MagicBaseData[] _shopTable = new MagicBaseData[3];
 
     private List<SlotController> _slotsData = new();
     private List<AttackSlotController> _attackSlotData = new();
@@ -101,6 +103,12 @@ public class ShopSceneManager : MonoBehaviour
         _chasTable = new(_table);
 
         _selectItem.SetItem(null);
+
+        // ↓ 追加：更新時にBuySlot（購入予定枠）のアイテムをクリアする
+        if (_buySlot != null)
+        {
+            _buySlot.SetItem(null);
+        }
 
         for (int c = 0; c < 3; c++)
         {

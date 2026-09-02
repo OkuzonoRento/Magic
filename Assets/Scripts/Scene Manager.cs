@@ -16,6 +16,10 @@ public class SceneManager : MonoBehaviour
     [SerializeField] private SceneState _sceneState;
     [SerializeField] private Inventory _inventory;
 
+    // 追加：選択されたマップデータを保持するプロパティ
+    private MapData _selectMapData;
+    public MapData SelectMapData { get => _selectMapData; set => _selectMapData = value; }
+
     public SceneState MySceneState { get => _sceneState; set => _sceneState = value; }
 
     private void Awake()
@@ -34,13 +38,13 @@ public class SceneManager : MonoBehaviour
     public void ChangeScene()
     {
 
-        switch(_sceneState)
+        switch (_sceneState)
         {
             case SceneState.MainMenu:
-                //_sceneState = SceneState.PermanentMenu;
-                //UnityEngine.SceneManagement.SceneManager.LoadScene("Permanent");
-                _sceneState = SceneState.MapSelectMenu;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
+                _sceneState = SceneState.PermanentMenu;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Permanent");
+                //_sceneState = SceneState.MapSelectMenu;
+                //UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
                 break;
 
             case SceneState.PermanentMenu:
@@ -63,7 +67,7 @@ public class SceneManager : MonoBehaviour
 
             case SceneState.Shop:
                 _sceneState = SceneState.InGame;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("InGame");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
                 break;
         }
     }

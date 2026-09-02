@@ -506,6 +506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShopSceneManager
   _selectItem: {fileID: 666881682}
+  _buySlot: {fileID: 964095616}
   _inventoryBase: {fileID: 11400000, guid: 0401765a71ceb7c4f9d5ddbfe94a9e51, type: 2}
   _shopTableBase: {fileID: 11400000, guid: 6140a9330d18767418e5d8e0b4ddc912, type: 2}
   _slotImageObject: {fileID: 3569158467141366556, guid: 98071cb77c2173a46ba9e9bfa5ae5f9c, type: 3}

@@ -7,7 +7,14 @@ public class SelectMapController : MonoBehaviour
 
     private void Start()
     {
-        MapData selectMap = _popController.Select;
+        // SceneManager‚©‚ç‘I‘ð‚³‚ê‚½MapData‚ðŽæ“¾
+        MapData selectMap = SceneManager._instance != null ? SceneManager._instance.SelectMapData : null;
+
+        if (selectMap == null)
+        {
+            Debug.LogError("‘I‘ð‚³‚ê‚½MapData‚ª‚ ‚è‚Ü‚¹‚ñ");
+            return;
+        }
 
         MapController[] maps = FindObjectsByType<MapController>(FindObjectsSortMode.None);
 
