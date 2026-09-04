@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class SensorController : MonoBehaviour
@@ -8,6 +9,8 @@ public class SensorController : MonoBehaviour
     private float _searchAngle;
     private NPCController _NPC_controller;
     private float _attackCoolTimer = 0f;
+    public Animator _animator;
+    private IDamageble player;
 
     private void Start()
     {
@@ -15,6 +18,7 @@ public class SensorController : MonoBehaviour
         _searchArea = gameObject.GetComponent<SphereCollider>();
         _searchAngle = _baseData.GetSearchAngle();
         _searchArea.radius = _baseData.GetSearchRadius();
+        _animator = transform.parent?.GetComponent<Animator>();
     }
 
     private void OnTriggerStay(Collider col)
@@ -22,7 +26,7 @@ public class SensorController : MonoBehaviour
         if (col.gameObject.tag == "Player" && _searchArea != null)
         {
             _attackCoolTimer += Time.deltaTime;
-            IDamageble player = col.gameObject.GetComponent<IDamageble>();
+            player = col.gameObject.GetComponent<IDamageble>();
             var playerDirection = col.transform.position - transform.position;
             var angle = Vector3.Angle(transform.forward, playerDirection);
             var dis = Vector3.Distance(col.gameObject.transform.position, transform.position);
@@ -34,6 +38,7 @@ public class SensorController : MonoBehaviour
                     if (_attackCoolTimer >= _baseData.GetAttackCoolTime())
                     {
                         _attackCoolTimer = 0f;
+                        _animator.SetTrigger("Attack");
                         player.AddDamage(_baseData.GetAttack());
                     }
                     _NPC_controller.SetState(NPCController.NPC_State.Chase, col.gameObject.transform);
@@ -67,6 +72,11 @@ public class SensorController : MonoBehaviour
         {
             _NPC_controller.SetState(NPCController.NPC_State.Return);
         }
+    }
+
+    public void PlayerAttack()
+    {
+        player.AddDamage(_baseData.GetAttack());
     }
 
 #if UNITY_EDITOR

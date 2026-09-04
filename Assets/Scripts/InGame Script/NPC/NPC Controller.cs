@@ -15,6 +15,7 @@ public class NPCController : MonoBehaviour, IDamageble
 
     [SerializeField] private EnemyStatusBaseData _baseData;
     [SerializeField] private Inventory _inventory;
+    [SerializeField] private SensorController _sensor;
     [SerializeField,Min(0)] private int _hp;
     [SerializeField,Min(0)] private int _defRate;
     [SerializeField] private DropTable _dropTable;
@@ -57,6 +58,7 @@ public class NPCController : MonoBehaviour, IDamageble
         {
             _agent.isStopped = true;
             _agent.velocity = Vector3.zero;
+            _sensor._animator.SetBool("Walk", false);
         }
         else if (_state == NPC_State.Chase)
         {
@@ -68,6 +70,7 @@ public class NPCController : MonoBehaviour, IDamageble
             {
                 SetDestination(_targetTransform.position);
                 _agent.SetDestination(GetDestination());
+                _sensor._animator.SetBool("Walk", true);
 
                 if (_backDis <= Mathf.Abs((_spawnPos - transform.position).magnitude))
                 {
@@ -210,6 +213,11 @@ public class NPCController : MonoBehaviour, IDamageble
             damage = 1;
         }
         _hp -= damage;
+    }
+
+    public void PlayerAttack()
+    {
+        _sensor.PlayerAttack();
     }
 
     public static bool Probability(float fPercent)
