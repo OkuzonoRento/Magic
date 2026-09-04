@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f0be775e1bd91e46ad22ac9f9c6874a, type: 3}
   m_Name: Slime Map
   m_EditorClassIdentifier: Assembly-CSharp::MapData
-  _mapID: 1
+  _mapID: 0
   _popCount: 15
   _popEnemy:
   - {fileID: 5508349645735032988, guid: 68513048cb49dd54fbbaecffccdedd04, type: 3}

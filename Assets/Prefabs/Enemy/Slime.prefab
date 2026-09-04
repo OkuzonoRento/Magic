@@ -67,6 +67,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SensorController
   _baseData: {fileID: 11400000, guid: f4f64083125ba3148904708fae958a27, type: 2}
+  _animator: {fileID: 0}
 --- !u!1 &5508349645735032988
 GameObject:
   m_ObjectHideFlags: 0
@@ -80,6 +81,7 @@ GameObject:
   - component: {fileID: 9011540284932005744}
   - component: {fileID: 3124899729777875432}
   - component: {fileID: 6492956749470738373}
+  - component: {fileID: 7108533263162077379}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Enemy
@@ -168,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCController
   _baseData: {fileID: 11400000, guid: f4f64083125ba3148904708fae958a27, type: 2}
   _inventory: {fileID: 11400000, guid: 0401765a71ceb7c4f9d5ddbfe94a9e51, type: 2}
+  _sensor: {fileID: 721120265253268657}
   _hp: 5
   _defRate: 0
   _dropTable: {fileID: 11400000, guid: 176ab582da53dfc4fa44d4e16d46663c, type: 2}
@@ -197,6 +200,28 @@ CapsuleCollider:
   m_Height: 0.5
   m_Direction: 1
   m_Center: {x: 0, y: 0.7, z: 0.175}
+--- !u!95 &7108533263162077379
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5508349645735032988}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ffa498e18dec8ec48ae606320970f5f9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7779848403545459613
 GameObject:
   m_ObjectHideFlags: 0
