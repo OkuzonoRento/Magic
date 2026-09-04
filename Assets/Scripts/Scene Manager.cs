@@ -66,7 +66,7 @@ public class SceneManager : MonoBehaviour
                 break;
 
             case SceneState.Shop:
-                _sceneState = SceneState.InGame;
+                _sceneState = SceneState.MapSelectMenu;
                 UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
                 break;
         }

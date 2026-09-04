@@ -22,7 +22,7 @@ public class ShopSceneManager : MonoBehaviour
 
     [Header("Shop")]
     [SerializeField] private TextMeshProUGUI _creditText;
-    [SerializeField] private TextMeshProUGUI _shopButtonText;
+    //[SerializeField] private TextMeshProUGUI _shopButtonText;
     [SerializeField] private GameObject[] _shopTableObject = new GameObject[3];
     [SerializeField] private TextMeshProUGUI[] _shopTableText = new TextMeshProUGUI[3];
     [System.NonSerialized] public MagicBaseData[] _shopTable = new MagicBaseData[3];
