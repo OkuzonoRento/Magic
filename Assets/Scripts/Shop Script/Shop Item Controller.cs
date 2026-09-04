@@ -109,9 +109,7 @@ public class ShopItemController : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         _isSelected = false;
 
-        _itemImage.color = Color.white;
-
-        _itemImage.sprite = _soldOutImage;
+        _itemImage.color = Color.clear;
 
         MyShopItem = null;
 
