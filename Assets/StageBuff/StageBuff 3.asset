@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf6ae4eeb262e1348960029f2bdfec0c, type: 3}
+  m_Name: StageBuff 3
+  m_EditorClassIdentifier: Assembly-CSharp::StageBuffData
+  m_BuffName: shield
+  m_BuffTips: allDamage0 oneTime
+  m_icon: {fileID: 0}
+  m_BuffValueInt: 100
+  m_BuffValueFloat: 0

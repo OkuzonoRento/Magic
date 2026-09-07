@@ -67,7 +67,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SensorController
   _baseData: {fileID: 11400000, guid: f4f64083125ba3148904708fae958a27, type: 2}
-  _animator: {fileID: 0}
+  _turnSpeed: 5
+  _animator: {fileID: 7108533263162077379}
 --- !u!1 &5508349645735032988
 GameObject:
   m_ObjectHideFlags: 0
@@ -82,6 +83,7 @@ GameObject:
   - component: {fileID: 3124899729777875432}
   - component: {fileID: 6492956749470738373}
   - component: {fileID: 7108533263162077379}
+  - component: {fileID: 2867516538245140592}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Enemy
@@ -177,6 +179,10 @@ MonoBehaviour:
   _credit: 2
   _state: 1
   _tactic: 1
+  _wanderRadius: 5
+  _wanderIntervalRange: {x: 3, y: 7}
+  _wanderDurationRange: {x: 2, y: 5}
+  _maxFreezeDuration: 4
 --- !u!136 &6492956749470738373
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -222,6 +228,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!136 &2867516538245140592
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5508349645735032988}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.25
+  m_Height: 3
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.5, z: 0.175}
 --- !u!1 &7779848403545459613
 GameObject:
   m_ObjectHideFlags: 0

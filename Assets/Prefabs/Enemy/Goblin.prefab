@@ -252,6 +252,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SensorController
   _baseData: {fileID: 11400000, guid: 0b6e0282befc398468e2dcbb8b172539, type: 2}
+  _attackRadius: 2
+  _attackAngle: 45
+  _animator: {fileID: 6514955643587203408}
 --- !u!1001 &5002419989388748221
 PrefabInstance:
   m_ObjectHideFlags: 0
