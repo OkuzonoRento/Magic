@@ -14,10 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStatusBaseData
   _hp: 5
   _attack: 1
-  _attackRadius: 2
   _attackCoolTime: 7.5
-  _attackAngle: 45
-  _comboCountRange: {x: 1, y: 3}
+  _attackPatterns:
+  - attackName: "\u30B9\u30BF\u30F3\u30D7\u653B\u6483"
+    triggerName: Stamp
+    damage: 5
+    attackRadius: 3
+    attackAngle: 360
+    maxDistance: 3
+    minDistance: 0
   _proximityRadius: 2
   _searchRadius: 10
   _searchAngle: 75

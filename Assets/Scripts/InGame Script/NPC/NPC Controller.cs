@@ -55,6 +55,11 @@ public class NPCController : MonoBehaviour, IDamageble
         _collider = gameObject.GetComponent<CapsuleCollider>();
         _agent.speed = _baseData.GetMoveSpeed();
         _agent.enabled = true;
+
+        // ★ 最小攻撃範囲（または指定の距離）を手前で止まる距離として設定
+        // 手動で float を指定するか、_baseData から距離を取得して設定します
+        _agent.stoppingDistance = 1.5f;
+
         SetState(NPC_State.Idle);
         _spawnPos = transform.position;
         _backDis = _baseData.GetBackDis();

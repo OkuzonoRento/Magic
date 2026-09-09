@@ -15,6 +15,15 @@ MonoBehaviour:
   _hp: 500
   _attack: 50
   _attackCoolTime: 7.5
+  _attackPatterns:
+  - attackName: 
+    triggerName: 
+    damage: 0
+    attackRadius: 0
+    attackAngle: 0
+    maxDistance: 0
+    minDistance: 0
+  _proximityRadius: 2
   _searchRadius: 250
   _searchAngle: 360
   _moveSpeed: 0

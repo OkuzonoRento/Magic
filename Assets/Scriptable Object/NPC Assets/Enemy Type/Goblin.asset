@@ -14,10 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStatusBaseData
   _hp: 10
   _attack: 5
-  _attackRadius: 2
   _attackCoolTime: 5
-  _attackAngle: 45
-  _comboCountRange: {x: 1, y: 3}
+  _attackPatterns:
+  - attackName: "\u3053\u3093\u68D2\u632F\u308A\u6255\u3044"
+    triggerName: Shake Off
+    damage: 10
+    attackRadius: 3
+    attackAngle: 80
+    maxDistance: 3
+    minDistance: 0
   _proximityRadius: 2
   _searchRadius: 15
   _searchAngle: 100
