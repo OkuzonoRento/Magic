@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e42437f453041a843b4570326d3670d4, type: 3}
+  m_Name: Split
+  m_EditorClassIdentifier: Assembly-CSharp::SplitMove
+  _splitCount: 6
+  _subBulletPrefab: {fileID: 8456312980695074176, guid: ac4ef7b89a165794cbfd499d5b3310ca, type: 3}
+  _maxSplitDepth: 2

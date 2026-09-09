@@ -8,13 +8,15 @@ public class MagicController : MonoBehaviour
     private Rigidbody _rb;
     private MoveType _moveData;
     [SerializeField] private int _playerAttack;
-    [SerializeField] private float _moveSpeed;  //Debug
-    [SerializeField] private int _atack;        //Debug
-    [SerializeField] private int _lv;           //Debug
+    [SerializeField] private float _moveSpeed;
+    [SerializeField] private int _atack;
+    [SerializeField] private int _lv;
     [SerializeField] private GameObject _spark;
     private float _timer;
 
     public float MyTimer { get => _timer; set => _timer = value; }
+    public int TotalAttack => _atack + _playerAttack + _lv;
+    public GameObject Spark => _spark;
 
     void Start()
     {
@@ -23,34 +25,14 @@ public class MagicController : MonoBehaviour
         _moveSpeed = _baseData.GetMagicMoveSpeed();
         _atack = _baseData.GetMagicAttack();
         _lv = _baseData.GetMagicLevel();
-        Destroy(gameObject, 2.5f);
+        Destroy(gameObject, 5.0f); // à¿ëSëŒçÙÇÃéıñΩÅií∑ÇﬂÅj
     }
 
     void FixedUpdate()
     {
-        _moveData.MagicMove(_rb, _moveSpeed, gameObject.transform, _target);
-    }
-
-    private void OnTriggerEnter(Collider col)
-    {
-        if(col.gameObject.tag == "Enemy")
+        if (_moveData != null)
         {
-            IDamageble damageObj = col.gameObject.GetComponent<IDamageble>();
-            if (damageObj != null)
-            {
-                if (_spark != null)
-                {
-                    Instantiate(_spark, transform.position, Quaternion.identity);
-                }
-
-                damageObj.AddDamage(_atack + _playerAttack + _lv);
-            }
-            Destroy(gameObject);
-        }
-        
-        if(col.gameObject.tag == "Wall")
-        {
-            Destroy(gameObject);
+            _moveData.MagicMove(_rb, _moveSpeed, gameObject.transform, _target);
         }
     }
 }

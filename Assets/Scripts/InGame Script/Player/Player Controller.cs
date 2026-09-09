@@ -1,7 +1,7 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-
 
 public class PlayerController : MonoBehaviour, IDamageble
 {
@@ -18,114 +18,138 @@ public class PlayerController : MonoBehaviour, IDamageble
     private Rigidbody _rb;
     private Vector3 _move;
     private Vector3 _moveForward;
-    [SerializeField] private int _maxHp;
+    [SerializeField] private int _maxHp = 100;
     private int _hp;
-    [SerializeField] private float _maxMoveSpeed;
+    [SerializeField] private float _maxMoveSpeed = 5f;
     private float _moveSpeed;
-    [SerializeField] private float _turnTimeRate = 0.5f;
+    [SerializeField] private float _turnTimeRate = 5.0f;
     private CameraController _cameraScript;
     [SerializeField] private Transform _magicParent;
-    private GameObject _AttackObject;
     [SerializeField] private Slider _hpUI;
 
     [SerializeField] private Inventory _inventory;
-
     [SerializeField] private MyAttack[] _myAttack = new MyAttack[3];
 
-    public MyAttack[] GetMyAttack { get => _myAttack; }
+    public MyAttack[] GetMyAttack => _myAttack;
 
     private void Awake()
     {
         Application.targetFrameRate = 60;
     }
 
-
-    private void OnEnable()
+    private void Start()
     {
-        _rb = gameObject.GetComponent<Rigidbody>();
+        _rb = GetComponent<Rigidbody>();
         _rb.constraints = RigidbodyConstraints.FreezeRotation;
-        _cameraScript = Camera.main.GetComponent<CameraController>();
+
+        if (Camera.main != null)
+        {
+            _cameraScript = Camera.main.GetComponent<CameraController>();
+        }
+
         _hp = _maxHp;
         _moveSpeed = _maxMoveSpeed;
-        _hpUI.maxValue = _maxHp;
 
-        if (_inventory != null)
+        if (_hpUI != null)
         {
-            for (int c = 0; c < _myAttack.Length; c++)
-            {
-                if (_inventory.GetAttackData()[c] == null)
-                {
-                    _myAttack[c]._attackData = null;
-                    continue;
-                }
-
-                _myAttack[c]._attackData = _inventory.GetAttackData()[c];
-                _myAttack[c]._attackMaxCooltime = _myAttack[c]._attackData.GetMagicCoolTime();
-                _myAttack[c]._attackInstantiate = _myAttack[c]._attackData.GetInstantiate();
-                _myAttack[c]._attackCooltime = 0.0f;
-                _myAttack[c]._attackTimer = 0.0f;
-            }
+            _hpUI.maxValue = _maxHp;
+            _hpUI.value = _hp;
         }
+
+        InitializeAttacksFromInventory();
     }
 
-    void Update()
+    private void Update()
     {
+        // 攻撃タイマーの更新（DeltaTimeで正確にカウント）
+        for (int c = 0; c < _myAttack.Length; c++)
+        {
+            if (_myAttack[c]._attackData != null)
+            {
+                _myAttack[c]._attackTimer += Time.deltaTime;
+            }
+        }
+
         Move();
+
+        // 攻撃判定
+        if (_cameraScript != null && _cameraScript._rock)
+        {
+            Atack();
+        }
     }
 
     private void FixedUpdate()
     {
-        for(int c = 0; c < _myAttack.Length; c++)
+        // 物理回転処理
+        if (_cameraScript != null && _cameraScript._rock && _cameraScript._rockonTarget != null)
         {
-            _myAttack[c]._attackTimer += Time.deltaTime;
-        }
-
-        _hpUI.value = _hp;
-
-        if (_cameraScript._rock)
-        {
-            var dir = _cameraScript._rockonTarget.transform.position - this.gameObject.transform.position;
+            Vector3 dir = _cameraScript._rockonTarget.transform.position - transform.position;
             dir.y = 0.0f;
-            Quaternion targetRotation = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _turnTimeRate);
-            Atack();
+            if (dir != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(dir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * _turnTimeRate);
+            }
         }
         else
         {
             Rotation();
         }
+
+        // HPバー更新
+        if (_hpUI != null)
+        {
+            _hpUI.value = _hp;
+        }
     }
+
+    private void InitializeAttacksFromInventory()
+    {
+        if (_inventory == null) return;
+
+        var attackDataList = _inventory.GetAttackData();
+        for (int c = 0; c < _myAttack.Length; c++)
+        {
+            if (c < attackDataList.Count() && attackDataList[c] != null)
+            {
+                _myAttack[c]._attackData = attackDataList[c];
+                _myAttack[c]._attackMaxCooltime = _myAttack[c]._attackData.GetMagicCoolTime();
+                _myAttack[c]._attackInstantiate = _myAttack[c]._attackData.GetInstantiate();
+                _myAttack[c]._attackCooltime = 0.0f;
+                _myAttack[c]._attackTimer = _myAttack[c]._attackMaxCooltime; // 初回即時発射可能に設定
+            }
+            else
+            {
+                _myAttack[c]._attackData = null;
+            }
+        }
+    }
+
     private void Move()
     {
+        if (Camera.main == null) return;
+
         Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
         _moveForward = cameraForward * _move.z + Camera.main.transform.right * _move.x;
         _moveForward = _moveForward.normalized;
 
-        if(_move.magnitude > 0)
+        if (_move.magnitude > 0)
         {
             _rb.linearVelocity = _moveForward * _moveSpeed * _move.magnitude + new Vector3(0, _rb.linearVelocity.y, 0);
         }
         else
         {
-            _rb.linearVelocity = new Vector3(0,_rb.linearVelocity.y, 0);
+            _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
         }
     }
 
     private void Rotation()
     {
-        Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
-        _moveForward = cameraForward * _move.z + Camera.main.transform.right * _move.x;
-        _moveForward = _moveForward.normalized;
-
-        if(_move.magnitude > 0)
+        if (_move.magnitude > 0)
         {
             Quaternion targetRotation = Quaternion.LookRotation(_moveForward);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _turnTimeRate);
-        }
-        else
-        {
-            Quaternion targetRotation = transform.rotation;
-            transform.rotation = targetRotation;
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * _turnTimeRate);
         }
     }
 
@@ -137,31 +161,51 @@ public class PlayerController : MonoBehaviour, IDamageble
 
             if (_myAttack[c]._attackTimer >= _myAttack[c]._attackMaxCooltime)
             {
-                if (_myAttack[c]._attackData.GetMagicParticle() == null) continue;
-                _AttackObject = _myAttack[c]._attackData.GetMagicParticle();
-                _myAttack[c]._attackTimer = 0;
-                _myAttack[c]._attackInstantiate.MagicInstantiate(_AttackObject, transform.position, transform.rotation, _magicParent, _myAttack[c]._attackData.GetMultiShotCount(), _myAttack[c]._attackData.GetShotAngle(), _myAttack[c]._attackData, _cameraScript._rockonTarget.transform);
+                GameObject attackObject = _myAttack[c]._attackData.GetMagicParticle();
+                if (attackObject == null || _myAttack[c]._attackInstantiate == null) continue;
+
+                _myAttack[c]._attackTimer = 0f;
+
+                Transform targetTransform = (_cameraScript != null && _cameraScript._rockonTarget != null)
+                    ? _cameraScript._rockonTarget.transform
+                    : null;
+
+                // 魔法の生成
+                _myAttack[c]._attackInstantiate.MagicInstantiate(
+                    attackObject,
+                    transform.position,
+                    transform.rotation,
+                    _magicParent,
+                    _myAttack[c]._attackData.GetMultiShotCount(),
+                    _myAttack[c]._attackData.GetShotAngle(),
+                    _myAttack[c]._attackData,
+                    targetTransform
+                );
             }
         }
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        _move = new Vector3(context.ReadValue<Vector2>().x, 0, context.ReadValue<Vector2>().y);
+        Vector2 input = context.ReadValue<Vector2>();
+        _move = new Vector3(input.x, 0, input.y);
     }
 
     private void OnTriggerEnter(Collider col)
     {
-        if(col.gameObject.tag == "Item")
+        if (col.CompareTag("Item"))
         {
-            var ItemData = col.GetComponent<ItemController>()._data;
-            _inventory.AddInventory(ItemData);
-            Destroy(col.gameObject);
+            ItemController item = col.GetComponent<ItemController>();
+            if (item != null)
+            {
+                _inventory.AddInventory(item._data);
+                Destroy(col.gameObject);
+            }
         }
     }
 
     public void AddDamage(int damage)
     {
-        _hp -= damage;
+        _hp = Mathf.Max(0, _hp - damage);
     }
 }

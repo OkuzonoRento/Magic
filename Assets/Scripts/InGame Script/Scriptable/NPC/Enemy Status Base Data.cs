@@ -34,5 +34,4 @@ public class EnemyStatusBaseData : EnemyStatus
     public int GetBackDis() => _backDis;
     public int GetDefRate() => _defRate;
     public bool GetIsBoss() => _isBoss;
-    public bool GetEditor() => _editor;
 }

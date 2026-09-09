@@ -242,21 +242,42 @@ public class SensorController : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (_baseData == null || _searchArea == null) return;
+        // ★ 実行中（Playモード）のみ描画する
+        if (!Application.isPlaying) return;
 
-        float effectiveAngle = _baseData.GetSearchAngle() * 0.5f;
+        if (_baseData == null) return;
+
+        // 1. 全方位近接感知エリア（緑）
+        Handles.color = new Color(0.0f, 1.0f, 0.0f, 0.05f);
+        Handles.DrawSolidArc(transform.position, Vector3.up, transform.forward, 360.0f, _proximityRadius);
+        Handles.color = new Color(0.0f, 1.0f, 0.0f, 0.5f);
+        Handles.DrawWireArc(transform.position, Vector3.up, transform.forward, 360.0f, _proximityRadius);
+
+        // 2. 扇形視野角エリア（緑）
+        float effectiveAngle = _searchAngle * 0.5f;
         float searchRadius = _baseData.GetSearchRadius();
         Vector3 searchFromDir = Quaternion.Euler(0.0f, -effectiveAngle, 0.0f) * transform.forward;
 
         Handles.color = new Color(0.0f, 1.0f, 0.0f, 0.05f);
         Handles.DrawSolidArc(transform.position, Vector3.up, searchFromDir, effectiveAngle * 2.0f, searchRadius);
+        Handles.color = new Color(0.0f, 1.0f, 0.0f, 0.5f);
+        Handles.DrawWireArc(transform.position, Vector3.up, searchFromDir, effectiveAngle * 2.0f, searchRadius);
 
+        // 3. 逃走境界線（青）: 視野距離の半分
+        Handles.color = new Color(0.0f, 0.5f, 1.0f, 0.4f);
+        Handles.DrawWireArc(transform.position, Vector3.up, searchFromDir, effectiveAngle * 2.0f, searchRadius * 0.5f);
+
+        // 4. すべての攻撃パターンエリア（赤～黄）
         if (_baseData.GetAttackPatterns() != null)
         {
             foreach (var pattern in _baseData.GetAttackPatterns())
             {
                 Vector3 attackFromDir = Quaternion.Euler(0.0f, -pattern.attackAngle, 0.0f) * transform.forward;
-                Handles.color = new Color(1.0f, 0.0f, 0.0f, 0.2f);
+
+                // 攻撃範囲の面と枠線
+                Handles.color = new Color(1.0f, 0.0f, 0.0f, 0.08f);
+                Handles.DrawSolidArc(transform.position, Vector3.up, attackFromDir, pattern.attackAngle * 2.0f, pattern.attackRadius);
+                Handles.color = new Color(1.0f, 0.2f, 0.2f, 0.8f);
                 Handles.DrawWireArc(transform.position, Vector3.up, attackFromDir, pattern.attackAngle * 2.0f, pattern.attackRadius);
             }
         }
