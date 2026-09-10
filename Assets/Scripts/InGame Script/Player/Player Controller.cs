@@ -32,6 +32,9 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     [SerializeField] private MyAttack[] _myAttack = new MyAttack[3];
 
+    [SerializeField] private PermanentPlayerBuffAll _PlayerBuffAll;//プレイヤーバフ適用用
+
+    [SerializeField] private PermanentPlayerDebuffAll _PlayerDeBuffAll;//プレイヤーデバフ適用用
     public MyAttack[] GetMyAttack { get => _myAttack; }
 
     private void Awake()
@@ -60,8 +63,10 @@ public class PlayerController : MonoBehaviour, IDamageble
                 }
 
                 _myAttack[c]._attackData = _inventory.GetAttackData()[c];
-                _myAttack[c]._attackMaxCooltime = _myAttack[c]._attackData.GetMagicCoolTime();
-                _myAttack[c]._attackInstantiate = _myAttack[c]._attackData.GetInstantiate();
+                _myAttack[c]._attackMaxCooltime = //変更箇所↓
+                    _PlayerBuffAll.Get_AttackSpan(
+                        _myAttack[c]._attackData.GetMagicCoolTime()
+                    ); _myAttack[c]._attackInstantiate = _myAttack[c]._attackData.GetInstantiate();//迄
                 _myAttack[c]._attackCooltime = 0.0f;
                 _myAttack[c]._attackTimer = 0.0f;
             }
@@ -75,7 +80,7 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     private void FixedUpdate()
     {
-        for(int c = 0; c < _myAttack.Length; c++)
+        for (int c = 0; c < _myAttack.Length; c++)
         {
             _myAttack[c]._attackTimer += Time.deltaTime;
         }
@@ -101,13 +106,13 @@ public class PlayerController : MonoBehaviour, IDamageble
         _moveForward = cameraForward * _move.z + Camera.main.transform.right * _move.x;
         _moveForward = _moveForward.normalized;
 
-        if(_move.magnitude > 0)
+        if (_move.magnitude > 0)
         {
             _rb.linearVelocity = _moveForward * _moveSpeed * _move.magnitude + new Vector3(0, _rb.linearVelocity.y, 0);
         }
         else
         {
-            _rb.linearVelocity = new Vector3(0,_rb.linearVelocity.y, 0);
+            _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
         }
     }
 
@@ -117,7 +122,7 @@ public class PlayerController : MonoBehaviour, IDamageble
         _moveForward = cameraForward * _move.z + Camera.main.transform.right * _move.x;
         _moveForward = _moveForward.normalized;
 
-        if(_move.magnitude > 0)
+        if (_move.magnitude > 0)
         {
             Quaternion targetRotation = Quaternion.LookRotation(_moveForward);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _turnTimeRate);
@@ -152,7 +157,7 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     private void OnTriggerEnter(Collider col)
     {
-        if(col.gameObject.tag == "Item")
+        if (col.gameObject.tag == "Item")
         {
             var ItemData = col.GetComponent<ItemController>()._data;
             _inventory.AddInventory(ItemData);

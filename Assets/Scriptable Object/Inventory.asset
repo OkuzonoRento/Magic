@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InventoryBaseData
   _defaltMagic: {fileID: 11400000, guid: 9eec9253887944b44bb3a65d614f7908, type: 2}
   _attackData:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 6db0619d6c87daf45ba61ca113e874b9, type: 2}
+  - {fileID: 11400000, guid: c5dc1ee92fe922e489794ea2a9227394, type: 2}
+  - {fileID: 11400000, guid: 7cd2486a8649746478c505e1407600ab, type: 2}
   _credit: 9545
   _inventory:
   - _item: {fileID: 11400000, guid: 1145300e866f69c4885b939b2feacc03, type: 2}

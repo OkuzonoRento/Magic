@@ -30,6 +30,8 @@ public class PermanentDebuffManager: MonoBehaviour
     [SerializeField] private PermanentCredit _CreditMaster;
     [SerializeField] private Text _SelectUI;
 
+    private SceneManager _sceneManager;
+
     [ContextMenu("SetUIList")]
     private void SetUIList()
     {
@@ -54,6 +56,7 @@ public class PermanentDebuffManager: MonoBehaviour
         _CreditMaster.Set_Initialize();
         m_Credit.Set_PermanentText = _SelectUI;
         _BuffManager.SetActive(false);
+        _sceneManager = SceneManager._instance;
     }
 
     
@@ -124,12 +127,25 @@ public class PermanentDebuffManager: MonoBehaviour
 
     private void Select()
     {
+
+        _sceneManager.SelectPlayerDeBuffs.Clear();//シーンマネージャーに保持させる
+
+        for (int i = 0; i < _PlayerDeBuffAll.Get_DeBuffCount; i++)
+        {
+            PermanentDebuff buff = _PlayerDeBuffAll.Get_DeBuffsData(i);
+
+            if (buff.Get_isUseData)
+            {
+                _sceneManager.SelectPlayerDeBuffs.Add(buff);
+            }
+        }
         _SelectUI.text = "+" + m_Credit.Get_PermanentCredit.ToString();
         _CreditMaster.Set_CreditUp = m_Credit.Get_PermanentCredit;
         _DebuffUI.SetActive(false);
         _BuffManager.SetActive(true);
         _BuffUI.SetActive(true);
-        
+        //_sceneManager.ChangeScene();
+
     }
     
   

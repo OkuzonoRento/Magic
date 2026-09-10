@@ -1531,6 +1531,8 @@ MonoBehaviour:
     _attackInstantiate: {fileID: 0}
     _attackMaxCooltime: 0
     _attackTimer: 0
+  _PlayerBuffAll: {fileID: 11400000, guid: f06859053928a914fb26f83288b8d60f, type: 2}
+  _PlayerDeBuffAll: {fileID: 11400000, guid: 58759238773d93045a8d394fc85dae24, type: 2}
 --- !u!136 &982539702
 CapsuleCollider:
   m_ObjectHideFlags: 0
