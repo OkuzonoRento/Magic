@@ -124,18 +124,6 @@ public class PermanentBuffManager : MonoBehaviour
 
     private void Select()
     {
-        _sceneManager.SelectPlayerBuffs.Clear();//シーンマネージャーに保持させる
-
-        for (int i = 0; i < _PlayerBuffAll.Get_BuffCount; i++)
-        {
-            PermanentBuff buff = _PlayerBuffAll.Get_BuffsData(i);
-
-            if (buff.Get_isUseData)
-            {
-                _sceneManager.SelectPlayerBuffs.Add(buff);
-            }
-        }
-
         _SelectUI.text = m_Credit.Get_PermanentCredit.ToString();
         _CreditMaster.Set_CreditDown = m_Credit.Get_PermanentCredit;
         _BuffUI.SetActive(false);

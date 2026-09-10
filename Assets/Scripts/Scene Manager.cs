@@ -1,22 +1,8 @@
 using UnityEngine;
-using System.Collections.Generic;
+
 public class SceneManager : MonoBehaviour
 {
     public static SceneManager _instance;
-
-    private List<PermanentBuff> _selectPlayerBuffs = new List<PermanentBuff>();//プレイヤーバフデータ保持
-
-    public List<PermanentBuff> SelectPlayerBuffs
-    {
-        get => _selectPlayerBuffs;
-    }
-
-    private List<PermanentDebuff> _selectPlayerDeBuffs = new List<PermanentDebuff>();//プレイヤーデバフデータ保持
-
-    public List<PermanentDebuff> SelectPlayerDeBuffs
-    {
-        get => _selectPlayerDeBuffs;
-    }
 
     public enum SceneState
     {
