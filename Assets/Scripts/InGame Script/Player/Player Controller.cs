@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,6 +30,12 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     [SerializeField] private Inventory _inventory;
     [SerializeField] private MyAttack[] _myAttack = new MyAttack[3];
+
+    // 同一魔法が連射されるのを防ぐための最小インターバル（秒）
+    [SerializeField] private float _sameMagicInterval = 0.2f;
+
+    // 同一魔法の最終発射時刻を記録する辞書
+    private Dictionary<MagicBaseData, float> _lastCastTimes = new Dictionary<MagicBaseData, float>();
 
     public MyAttack[] GetMyAttack => _myAttack;
 
@@ -157,14 +164,28 @@ public class PlayerController : MonoBehaviour, IDamageble
     {
         for (int c = 0; c < _myAttack.Length; c++)
         {
-            if (_myAttack[c]._attackData == null) continue;
+            MagicBaseData currentData = _myAttack[c]._attackData;
+            if (currentData == null) continue;
 
+            // 1. 各スロットの個別クールタイムチェック
             if (_myAttack[c]._attackTimer >= _myAttack[c]._attackMaxCooltime)
             {
-                GameObject attackObject = _myAttack[c]._attackData.GetMagicParticle();
+                // 2. 同一魔法の連続/同時発射防止チェック
+                if (_lastCastTimes.TryGetValue(currentData, out float lastCastTime))
+                {
+                    if (Time.time - lastCastTime < _sameMagicInterval)
+                    {
+                        // 前の同一魔法から時間が経っていないため発射を見送る
+                        continue;
+                    }
+                }
+
+                GameObject attackObject = currentData.GetMagicParticle();
                 if (attackObject == null || _myAttack[c]._attackInstantiate == null) continue;
 
+                // タイマーのリセットと最終発射時刻の記録
                 _myAttack[c]._attackTimer = 0f;
+                _lastCastTimes[currentData] = Time.time;
 
                 Transform targetTransform = (_cameraScript != null && _cameraScript._rockonTarget != null)
                     ? _cameraScript._rockonTarget.transform
@@ -176,9 +197,9 @@ public class PlayerController : MonoBehaviour, IDamageble
                     transform.position,
                     transform.rotation,
                     _magicParent,
-                    _myAttack[c]._attackData.GetMultiShotCount(),
-                    _myAttack[c]._attackData.GetShotAngle(),
-                    _myAttack[c]._attackData,
+                    currentData.GetMultiShotCount(),
+                    currentData.GetShotAngle(),
+                    currentData,
                     targetTransform
                 );
             }

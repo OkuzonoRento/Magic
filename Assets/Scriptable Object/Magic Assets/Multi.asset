@@ -21,7 +21,7 @@ MonoBehaviour:
   _magicLevel: 1
   _magicAttack: 1
   _magicCoolTime: 1.25
-  _magicMoveSpeed: 10
+  _magicMoveSpeed: 15
   _multiShotCount: 5
   _shotAngle: 45
   _magicParticle: {fileID: 8456312980695074176, guid: 937b7ada378c33243a6c4d34bc7be9c8, type: 3}

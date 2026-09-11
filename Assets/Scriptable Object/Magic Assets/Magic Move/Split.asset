@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e42437f453041a843b4570326d3670d4, type: 3}
   m_Name: Split
   m_EditorClassIdentifier: Assembly-CSharp::SplitMove
-  _splitCount: 6
+  _splitCount: 4
   _subBulletPrefab: {fileID: 8456312980695074176, guid: ac4ef7b89a165794cbfd499d5b3310ca, type: 3}
   _maxSplitDepth: 2

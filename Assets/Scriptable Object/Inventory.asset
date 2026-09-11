@@ -15,17 +15,17 @@ MonoBehaviour:
   _defaltMagic: {fileID: 11400000, guid: 9eec9253887944b44bb3a65d614f7908, type: 2}
   _attackData:
   - {fileID: 11400000, guid: e1f4d659ee6e4364098afbaa8c2075ac, type: 2}
-  - {fileID: 0}
-  - {fileID: 0}
-  _credit: 10676
+  - {fileID: 11400000, guid: e1f4d659ee6e4364098afbaa8c2075ac, type: 2}
+  - {fileID: 11400000, guid: e1f4d659ee6e4364098afbaa8c2075ac, type: 2}
+  _credit: 13577
   _inventory:
   - _item: {fileID: 11400000, guid: 1145300e866f69c4885b939b2feacc03, type: 2}
-    _count: 48
+    _count: 62
     _itemImage: {fileID: 21300000, guid: af3641223ee994e488d65e395eb8e988, type: 3}
     _amount: 15
     _itemType: 1
   - _item: {fileID: 11400000, guid: 8dd41bdf5c2426a44bf29a28c62437ae, type: 2}
-    _count: 15
+    _count: 100
     _itemImage: {fileID: 21300000, guid: 7851df24f6eea22468f0d92b497bc56f, type: 3}
     _amount: 5
     _itemType: 1

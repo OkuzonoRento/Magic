@@ -291,7 +291,16 @@ public class NPCController : MonoBehaviour, IDamageble
             {
                 Vector3 clonePos = transform.position;
                 clonePos.y = 0.75f;
-                Instantiate(item.GetDropObject(), clonePos, Quaternion.identity);
+
+                GameObject spawnedItem = Instantiate(item.GetDropObject(), clonePos, Quaternion.identity);
+
+                // ItemControllerの取得・アタッチとデータの代入
+                ItemController itemController = spawnedItem.GetComponent<ItemController>();
+                if (itemController == null)
+                {
+                    itemController = spawnedItem.AddComponent<ItemController>();
+                }
+                itemController._data = item;
             }
         }
     }

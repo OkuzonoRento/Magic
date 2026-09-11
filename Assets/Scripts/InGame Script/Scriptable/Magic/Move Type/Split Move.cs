@@ -83,11 +83,6 @@ public class SplitBullet : MonoBehaviour
             _ignoredEnemyIds.Add(enemyId);
             SpawnSubBullets();
         }
-        // 壁やステージに当たった場合もその場で拡散
-        else if (col.CompareTag("Wall") || col.CompareTag("Stage"))
-        {
-            SpawnSubBullets();
-        }
     }
 
     private void SpawnSubBullets()

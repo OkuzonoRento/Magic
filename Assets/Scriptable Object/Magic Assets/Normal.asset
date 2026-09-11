@@ -19,7 +19,7 @@ MonoBehaviour:
   _amount: 500
   _isCanStack: 0
   _magicLevel: 1
-  _magicAttack: 2
+  _magicAttack: 3
   _magicCoolTime: 0.4
   _magicMoveSpeed: 15
   _multiShotCount: 1
