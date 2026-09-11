@@ -42,32 +42,36 @@ public class SceneManager : MonoBehaviour
         {
             case SceneState.MainMenu:
                 _sceneState = SceneState.PermanentMenu;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Permanent");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("2_Permanent");
                 //_sceneState = SceneState.MapSelectMenu;
                 //UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
                 break;
 
             case SceneState.PermanentMenu:
                 _sceneState = SceneState.MapSelectMenu;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("3_MapSelect");
                 break;
 
             case SceneState.MapSelectMenu:
+                //_sceneState = SceneState.StageBuffMenu;
+                //UnityEngine.SceneManagement.SceneManager.LoadScene("4_StageBuff");
                 _sceneState = SceneState.InGame;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("InGame");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("5_InGame");
                 break;
 
             case SceneState.StageBuffMenu:
+                _sceneState = SceneState.InGame;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("5_InGame");
                 break;
 
             case SceneState.InGame:
                 _sceneState = SceneState.Shop;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Shop");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("6_Shop");
                 break;
 
             case SceneState.Shop:
                 _sceneState = SceneState.MapSelectMenu;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("3_MapSelect");
                 break;
         }
     }
