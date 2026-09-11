@@ -41,10 +41,10 @@ public class SceneManager : MonoBehaviour
         switch (_sceneState)
         {
             case SceneState.MainMenu:
-                _sceneState = SceneState.PermanentMenu;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("2_Permanent");
-                //_sceneState = SceneState.MapSelectMenu;
-                //UnityEngine.SceneManagement.SceneManager.LoadScene("MapSelect");
+                //_sceneState = SceneState.PermanentMenu;
+                //UnityEngine.SceneManagement.SceneManager.LoadScene("2_Permanent");
+                _sceneState = SceneState.MapSelectMenu;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("3_MapSelect");
                 break;
 
             case SceneState.PermanentMenu:
