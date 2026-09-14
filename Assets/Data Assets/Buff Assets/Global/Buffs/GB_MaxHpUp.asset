@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cf9c7958f3fdac499548ad84feb4518, type: 3}
+  m_Name: GB_MaxHpUp
+  m_EditorClassIdentifier: Assembly-CSharp::BuffSystem.Core.BuffData
+  _buffId: buff_max_hp_up
+  _buffName: "\u6700\u5927\u4F53\u529B\u5897\u52A0"
+  _description: "\u30D7\u30EC\u30A4\u30E4\u30FC\u306E\u6700\u5927HP 25% \u4E0A\u6607"
+  _icon: {fileID: 0}
+  _scope: 0
+  _creditCost: 90
+  _targetStatId: MaxHP
+  _value: 0.25
+  _maxStacks: 1
+  _isSelfDamageBuff: 0
+  _selfDamagePercent: 0.02
+  _stopSelfDamageHpThreshold: 0.2
+  _debuffPenaltyValue: -0.3

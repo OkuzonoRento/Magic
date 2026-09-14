@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cf9c7958f3fdac499548ad84feb4518, type: 3}
+  m_Name: GD_ShopPriceUp
+  m_EditorClassIdentifier: Assembly-CSharp::BuffSystem.Core.BuffData
+  _buffId: debuff_shop_price_up
+  _buffName: "\u7269\u4FA1\u9AD8\u9A30"
+  _description: "\u8CFC\u5165\u984D 30% \u4E0A\u6607"
+  _icon: {fileID: 0}
+  _scope: 0
+  _creditCost: 80
+  _targetStatId: ShopPrice
+  _value: 0.3
+  _maxStacks: 1
+  _isSelfDamageBuff: 0
+  _selfDamagePercent: 0.02
+  _stopSelfDamageHpThreshold: 0.2
+  _debuffPenaltyValue: -0.3
