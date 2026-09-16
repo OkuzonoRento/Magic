@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using BuffSystem.Core;
 
 public class NPCController : MonoBehaviour, IDamageble
 {
@@ -17,8 +18,13 @@ public class NPCController : MonoBehaviour, IDamageble
     [SerializeField] private EnemyStatusBaseData _baseData;
     [SerializeField] private Inventory _inventory;
     [SerializeField] private SensorController _sensor;
+
+    [Header("Status (Read Only)")]
+    [SerializeField, Min(0)] private int _baseMaxHp;
+    [SerializeField, Min(0)] private int _maxHp;
     [SerializeField, Min(0)] private int _hp;
     [SerializeField, Min(0)] private int _defRate;
+
     [SerializeField] private DropTable _dropTable;
     [SerializeField, Min(0)] private int _credit;
     private bool _isBoss;
@@ -29,7 +35,6 @@ public class NPCController : MonoBehaviour, IDamageble
     private NavMeshAgent _agent;
     private Vector3 _destination;
 
-    //private int _attackCount = 1;
     private float _backDis;
     private Vector3 _spawnPos;
 
@@ -45,42 +50,65 @@ public class NPCController : MonoBehaviour, IDamageble
     private float _currentWanderDuration;
     private bool _isWandering;
 
-    // 保険用タイマー（コンボ数増加を考慮して少し長めに設定）
+    // 保険用タイマー
     private float _freezeTimer = 0f;
     [SerializeField] private float _maxFreezeDuration = 4.0f;
+
+    private BuffHandler _buffHandler;
+
+    private void Awake()
+    {
+        _buffHandler = GetComponent<BuffHandler>();
+        if (_buffHandler == null)
+        {
+            _buffHandler = gameObject.AddComponent<BuffHandler>();
+        }
+
+        // 初期化：BaseDataからの読み込みはAwakeで先に行う
+        if (_baseData != null)
+        {
+            _baseMaxHp = _baseData.GetHP();
+            _defRate = _baseData.GetDefRate();
+            _isBoss = _baseData.GetIsBoss();
+            _backDis = _baseData.GetBackDis();
+        }
+    }
 
     private void Start()
     {
         _agent = gameObject.GetComponent<NavMeshAgent>();
         _collider = gameObject.GetComponent<CapsuleCollider>();
-        _agent.speed = _baseData.GetMoveSpeed();
-        _agent.enabled = true;
+        if (_agent != null)
+        {
+            _agent.enabled = true;
+            _agent.stoppingDistance = 1.5f;
+        }
 
-        // ★ 最小攻撃範囲（または指定の距離）を手前で止まる距離として設定
-        // 手動で float を指定するか、_baseData から距離を取得して設定します
-        _agent.stoppingDistance = 1.5f;
+        _spawnPos = transform.position;
+
+        // ★ HPの初期化（初回のみ_baseMaxHpをそのまま現在HPにする）
+        float hpMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("MaxHP") : 1.0f;
+        _maxHp = Mathf.RoundToInt(_baseMaxHp * hpMult);
+        _hp = _maxHp; // 生成時は満タンでセット
 
         SetState(NPC_State.Idle);
-        _spawnPos = transform.position;
-        _backDis = _baseData.GetBackDis();
-        _hp = _baseData.GetHP();
-        _defRate = _baseData.GetDefRate();
-        _isBoss = _baseData.GetIsBoss();
-
         ResetWanderInterval();
     }
 
     private void Update()
     {
+        // バフ状態を反映（移動速度・最大HPの同期）
+        UpdateBuffAppliedStats();
+
         if (_state == NPC_State.Stop)
         {
-            _agent.isStopped = true;
-            _sensor._animator.SetBool("Walk", false);
+            if (_agent != null) _agent.isStopped = true;
+            if (_sensor != null && _sensor._animator != null) _sensor._animator.SetBool("Walk", false);
         }
         else if (_state == NPC_State.Freeze)
         {
-            _agent.isStopped = true;
-            _sensor._animator.SetBool("Walk", false);
+            if (_agent != null) _agent.isStopped = true;
+            if (_sensor != null && _sensor._animator != null) _sensor._animator.SetBool("Walk", false);
 
             _freezeTimer += Time.deltaTime;
             if (_freezeTimer >= _maxFreezeDuration)
@@ -99,16 +127,16 @@ public class NPCController : MonoBehaviour, IDamageble
             {
                 SetState(NPC_State.Idle);
             }
-            else
+            else if (_agent != null)
             {
                 SetDestination(_targetTransform.position);
                 _agent.isStopped = false;
                 _agent.SetDestination(GetDestination());
-                _sensor._animator.SetBool("Walk", true);
+                if (_sensor != null && _sensor._animator != null) _sensor._animator.SetBool("Walk", true);
 
                 if (_backDis <= Mathf.Abs((_spawnPos - transform.position).magnitude))
                 {
-                    SetState(NPCController.NPC_State.Return);
+                    SetState(NPC_State.Return);
                 }
 
                 var dir = (GetDestination() - transform.position).normalized;
@@ -126,7 +154,7 @@ public class NPCController : MonoBehaviour, IDamageble
             {
                 SetState(NPC_State.Idle);
             }
-            else
+            else if (_agent != null)
             {
                 Vector3 fleeDir = (transform.position - _targetTransform.position).normalized;
                 Vector3 fleeDestination = transform.position + fleeDir * 3.0f;
@@ -136,7 +164,7 @@ public class NPCController : MonoBehaviour, IDamageble
                 {
                     _agent.isStopped = false;
                     _agent.SetDestination(hit.position);
-                    _sensor._animator.SetBool("Walk", true);
+                    if (_sensor != null && _sensor._animator != null) _sensor._animator.SetBool("Walk", true);
                 }
 
                 var dir = (_targetTransform.position - transform.position).normalized;
@@ -150,21 +178,24 @@ public class NPCController : MonoBehaviour, IDamageble
         }
         else if (_state == NPC_State.Return)
         {
-            _agent.isStopped = false;
-            SetDestination(_spawnPos);
-            _agent.SetDestination(GetDestination());
-            _sensor._animator.SetBool("Walk", true);
-
-            if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance)
+            if (_agent != null)
             {
-                SetState(NPC_State.Idle);
+                _agent.isStopped = false;
+                SetDestination(_spawnPos);
+                _agent.SetDestination(GetDestination());
+                if (_sensor != null && _sensor._animator != null) _sensor._animator.SetBool("Walk", true);
+
+                if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance)
+                {
+                    SetState(NPC_State.Idle);
+                }
             }
         }
 
         if (_hp <= 0)
         {
-            Destroy(_collider);
-            _agent.isStopped = true;
+            if (_collider != null) Destroy(_collider);
+            if (_agent != null) _agent.isStopped = true;
             if (_dropTable != null)
             {
                 DropItem();
@@ -173,13 +204,45 @@ public class NPCController : MonoBehaviour, IDamageble
         }
     }
 
+    /// <summary>
+    /// 移動速度や最大HPなどのバフ効果を毎フレーム同期
+    /// </summary>
+    private void UpdateBuffAppliedStats()
+    {
+        if (_baseData == null) return;
+
+        // 移動速度バフ反映
+        if (_agent != null)
+        {
+            float speedMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("MoveSpeed") : 1.0f;
+            _agent.speed = _baseData.GetMoveSpeed() * speedMult;
+        }
+
+        // 最大HPバフ反映
+        float hpMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("MaxHP") : 1.0f;
+        _maxHp = Mathf.RoundToInt(_baseMaxHp * hpMult);
+        _hp = Mathf.Clamp(_hp, 0, _maxHp);
+    }
+
+    /// <summary>
+    /// 外部からバフ更新時などに呼び出せるHP同期
+    /// </summary>
+    public void RefreshHPStatus()
+    {
+        float hpMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("MaxHP") : 1.0f;
+        _maxHp = Mathf.RoundToInt(_baseMaxHp * hpMult);
+        _hp = Mathf.Clamp(_hp, 0, _maxHp);
+    }
+
     private void HandleRandomWander()
     {
+        if (_agent == null) return;
+
         if (!_isWandering)
         {
             _wanderTimer += Time.deltaTime;
             _agent.isStopped = true;
-            _sensor._animator.SetBool("Walk", false);
+            if (_sensor != null && _sensor._animator != null) _sensor._animator.SetBool("Walk", false);
 
             if (_wanderTimer >= _currentWanderInterval)
             {
@@ -197,7 +260,7 @@ public class NPCController : MonoBehaviour, IDamageble
         {
             _wanderStateTimer += Time.deltaTime;
             bool isWalking = _agent.velocity.sqrMagnitude > 0.1f;
-            _sensor._animator.SetBool("Walk", isWalking);
+            if (_sensor != null && _sensor._animator != null) _sensor._animator.SetBool("Walk", isWalking);
 
             if (_wanderStateTimer >= _currentWanderDuration || (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance))
             {
@@ -272,18 +335,27 @@ public class NPCController : MonoBehaviour, IDamageble
     public void AddDamage(int damage)
     {
         damage -= damage * (_defRate / 100);
-        if (damage < 1) damage = 1;
-        _hp -= damage;
+
+        float takenMult = _buffHandler != null ? _buffHandler.GetDamageTakenMultiplier() : 1.0f;
+        int finalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * takenMult));
+
+        _hp = Mathf.Max(0, _hp - finalDamage);
     }
 
     public void PlayerAttack()
     {
-        _sensor.PlayerAttack();
+        if (_sensor != null) _sensor.PlayerAttack();
     }
 
     public void DropItem()
     {
-        _inventory.AddCredit(_credit);
+        if (_inventory != null)
+        {
+            _inventory.AddCredit(_credit);
+        }
+
+        if (_dropTable == null) return;
+
         foreach (Item item in _dropTable.GetItemTable())
         {
             float roll = Random.value;
@@ -294,7 +366,6 @@ public class NPCController : MonoBehaviour, IDamageble
 
                 GameObject spawnedItem = Instantiate(item.GetDropObject(), clonePos, Quaternion.identity);
 
-                // ItemControllerの取得・アタッチとデータの代入
                 ItemController itemController = spawnedItem.GetComponent<ItemController>();
                 if (itemController == null)
                 {

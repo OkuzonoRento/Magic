@@ -13,9 +13,14 @@ namespace BuffSystem.Core
             _damageable = GetComponent<IDamageble>();
         }
 
+        // BuffHandler.cs の AddBuff メソッド内
         public void AddBuff(BuffData buff)
         {
-            if (buff == null) return;
+            if (buff == null)
+            {
+                Debug.LogError($"[{gameObject.name}] AddBuffに null が渡されました！");
+                return;
+            }
 
             if (_activeBuffs.ContainsKey(buff))
             {
@@ -28,6 +33,8 @@ namespace BuffSystem.Core
             {
                 _activeBuffs.Add(buff, 1);
             }
+
+            Debug.Log($"[{gameObject.name}] バフ追加成功: {buff.BuffName} (現在のスタック: {_activeBuffs[buff]})");
         }
 
         // 一般的なステータス倍率の計算

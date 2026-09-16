@@ -17,6 +17,7 @@ MonoBehaviour:
   _description: "\u6575\u306E\u4F53\u529B\u30FB\u653B\u6483\u529B\u304C 25% \u5897\u52A0\u3057\u3001\u653B\u6483\u983B\u5EA6\u304C\u4E0A\u6607\u3059\u308B"
   _icon: {fileID: 0}
   _scope: 0
+  _targetType: 1
   _creditCost: 120
   _targetStatId: EnemyStat
   _value: 0.25

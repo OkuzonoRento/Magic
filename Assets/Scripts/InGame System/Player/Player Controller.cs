@@ -20,18 +20,22 @@ public class PlayerController : MonoBehaviour, IDamageble
     private Rigidbody _rb;
     private Vector3 _move;
     private Vector3 _moveForward;
+
+    [Header("Base Settings")]
     [SerializeField] private int _baseMaxHp = 100;
     private int _maxHp;
     private int _hp;
     [SerializeField] private float _maxMoveSpeed = 5f;
     [SerializeField] private float _turnTimeRate = 5.0f;
+
+    [Header("References")]
     private CameraController _cameraScript;
     [SerializeField] private Transform _magicParent;
     [SerializeField] private Slider _hpUI;
-
     [SerializeField] private Inventory _inventory;
-    [SerializeField] private MyAttack[] _myAttack = new MyAttack[3];
 
+    [Header("Attacks & Targeting")]
+    [SerializeField] private MyAttack[] _myAttack = new MyAttack[3];
     [SerializeField] private float _sameMagicInterval = 0.2f;
     private Dictionary<MagicBaseData, float> _lastCastTimes = new Dictionary<MagicBaseData, float>();
 
@@ -43,7 +47,10 @@ public class PlayerController : MonoBehaviour, IDamageble
     {
         Application.targetFrameRate = 60;
         _buffHandler = GetComponent<BuffHandler>();
-        if (_buffHandler == null) _buffHandler = gameObject.AddComponent<BuffHandler>();
+        if (_buffHandler == null)
+        {
+            _buffHandler = gameObject.AddComponent<BuffHandler>();
+        }
     }
 
     private void Start()
@@ -56,22 +63,19 @@ public class PlayerController : MonoBehaviour, IDamageble
             _cameraScript = Camera.main.GetComponent<CameraController>();
         }
 
-        // 最大HPの補正
-        float hpMult = _buffHandler.GetStatMultiplier("MaxHP");
-        _maxHp = Mathf.RoundToInt(_baseMaxHp * hpMult);
-        _hp = _maxHp;
+        // 初期ステータス計算（HP）
+        RefreshHPStatus();
 
-        if (_hpUI != null)
-        {
-            _hpUI.maxValue = _maxHp;
-            _hpUI.value = _hp;
-        }
-
+        // インベントリから装備魔法を同期
         InitializeAttacksFromInventory();
     }
 
     private void Update()
     {
+        // 1. バフ状態を反映したステータスの更新
+        UpdateBuffAppliedStats();
+
+        // 2. クールタイムタイマーの進行
         for (int c = 0; c < _myAttack.Length; c++)
         {
             if (_myAttack[c]._attackData != null)
@@ -80,9 +84,11 @@ public class PlayerController : MonoBehaviour, IDamageble
             }
         }
 
+        // 3. 移動処理
         Move();
 
-        if (_cameraScript != null && _cameraScript._rock)
+        // 4. センサー/カメラでターゲットを捕捉していれば自動攻撃を実行
+        if (_cameraScript != null && _cameraScript._rock && _cameraScript._rockonTarget != null)
         {
             Atack();
         }
@@ -90,6 +96,7 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     private void FixedUpdate()
     {
+        // ターゲットを捕捉している時は敵の方向へ向く
         if (_cameraScript != null && _cameraScript._rock && _cameraScript._rockonTarget != null)
         {
             Vector3 dir = _cameraScript._rockonTarget.transform.position - transform.position;
@@ -111,25 +118,79 @@ public class PlayerController : MonoBehaviour, IDamageble
         }
     }
 
-    private void InitializeAttacksFromInventory()
+    /// <summary>
+    /// インベントリから魔法データを読み込み、初期化する
+    /// </summary>
+    public void InitializeAttacksFromInventory()
     {
         if (_inventory == null) return;
 
+        // スロット封印バフが適応されている場合は反映
+        if (_buffHandler != null)
+        {
+            _inventory.ApplyDisabledSlots(_buffHandler);
+        }
+
         var attackDataList = _inventory.GetAttackData();
+
         for (int c = 0; c < _myAttack.Length; c++)
         {
-            if (c < attackDataList.Count() && attackDataList[c] != null)
+            if (c < attackDataList.Length && attackDataList[c] != null)
             {
                 _myAttack[c]._attackData = attackDataList[c];
-                _myAttack[c]._attackMaxCooltime = _myAttack[c]._attackData.GetMagicCoolTime();
                 _myAttack[c]._attackInstantiate = _myAttack[c]._attackData.GetInstantiate();
                 _myAttack[c]._attackCooltime = 0.0f;
-                _myAttack[c]._attackTimer = _myAttack[c]._attackMaxCooltime;
+
+                // 基礎クールタイムを取得
+                float baseCooltime = _myAttack[c]._attackData.GetMagicCoolTime();
+                float cdMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("Cooldown") : 1.0f;
+
+                // バフ適用後のクールタイム値を Inspector 用変数にセット
+                _myAttack[c]._attackMaxCooltime = baseCooltime * cdMult;
+                _myAttack[c]._attackTimer = _myAttack[c]._attackMaxCooltime; // 最初から攻撃可能状態にセット
             }
             else
             {
                 _myAttack[c]._attackData = null;
+                _myAttack[c]._attackInstantiate = null;
+                _myAttack[c]._attackMaxCooltime = 0;
+                _myAttack[c]._attackTimer = 0;
             }
+        }
+    }
+
+    /// <summary>
+    /// バフを毎フレーム反映し、クールタイム表示などをリアルタイムに同期
+    /// </summary>
+    private void UpdateBuffAppliedStats()
+    {
+
+        float cdMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("Cooldown") : 1.0f;
+
+        for (int c = 0; c < _myAttack.Length; c++)
+        {
+            if (_myAttack[c]._attackData != null)
+            {
+                // 基礎データから算出した最大クールタイムをInspector表示・判定用に常時更新
+                float baseCooltime = _myAttack[c]._attackData.GetMagicCoolTime();
+                _myAttack[c]._attackMaxCooltime = baseCooltime * cdMult;
+            }
+        }
+    }
+
+    /// <summary>
+    /// バフ適用済みの最大HPおよび現在のHPの再計算
+    /// </summary>
+    public void RefreshHPStatus()
+    {
+        float hpMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("MaxHP") : 1.0f;
+        _maxHp = Mathf.RoundToInt(_baseMaxHp * hpMult);
+        _hp = Mathf.Clamp(_hp > 0 ? _hp : _maxHp, 0, _maxHp);
+
+        if (_hpUI != null)
+        {
+            _hpUI.maxValue = _maxHp;
+            _hpUI.value = _hp;
         }
     }
 
@@ -137,7 +198,7 @@ public class PlayerController : MonoBehaviour, IDamageble
     {
         if (Camera.main == null) return;
 
-        float speedMult = _buffHandler.GetStatMultiplier("MoveSpeed");
+        float speedMult = _buffHandler != null ? _buffHandler.GetStatMultiplier("MoveSpeed") : 1.0f;
         float currentSpeed = _maxMoveSpeed * speedMult;
 
         Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
@@ -163,18 +224,18 @@ public class PlayerController : MonoBehaviour, IDamageble
         }
     }
 
+    /// <summary>
+    /// 自動ターゲット攻撃処理
+    /// </summary>
     private void Atack()
     {
         for (int c = 0; c < _myAttack.Length; c++)
         {
-            // データが null の場合は発射しない（ショップで代入された null で自動回避）
             MagicBaseData currentData = _myAttack[c]._attackData;
             if (currentData == null) continue;
 
-            float cdMult = _buffHandler.GetStatMultiplier("Cooldown");
-            float finalCooltime = _myAttack[c]._attackMaxCooltime * cdMult;
-
-            if (_myAttack[c]._attackTimer >= finalCooltime)
+            // クールタイムを満たしていれば発射
+            if (_myAttack[c]._attackTimer >= _myAttack[c]._attackMaxCooltime)
             {
                 if (_lastCastTimes.TryGetValue(currentData, out float lastCastTime))
                 {
@@ -187,23 +248,28 @@ public class PlayerController : MonoBehaviour, IDamageble
                 _myAttack[c]._attackTimer = 0f;
                 _lastCastTimes[currentData] = Time.time;
 
-                // 確率不発の判定
-                if (_buffHandler.ShouldFailAction())
+                // バフによる確率不発の判定
+                if (_buffHandler != null && _buffHandler.ShouldFailAction())
                 {
-                    Debug.Log("魔法が不発に終わりました。");
+                    Debug.Log("バフ効果により魔法が不発になりました。");
                     continue;
                 }
 
                 GameObject attackObject = currentData.GetMagicParticle();
                 if (attackObject == null || _myAttack[c]._attackInstantiate == null) continue;
 
-                // 自傷処理
-                _buffHandler.TriggerSelfDamage(_hp, _maxHp);
+                // バフによる自傷ダメージ処理
+                if (_buffHandler != null)
+                {
+                    _buffHandler.TriggerSelfDamage(_hp, _maxHp);
+                }
 
+                // センサー/カメラで取得されたターゲットを取得
                 Transform targetTransform = (_cameraScript != null && _cameraScript._rockonTarget != null)
                     ? _cameraScript._rockonTarget.transform
                     : null;
 
+                // 魔法の生成実行
                 _myAttack[c]._attackInstantiate.MagicInstantiate(
                     attackObject,
                     transform.position,
@@ -239,7 +305,7 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     public void AddDamage(int damage)
     {
-        float takenMult = _buffHandler.GetDamageTakenMultiplier();
+        float takenMult = _buffHandler != null ? _buffHandler.GetDamageTakenMultiplier() : 1.0f;
         int finalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * takenMult));
 
         _hp = Mathf.Max(0, _hp - finalDamage);

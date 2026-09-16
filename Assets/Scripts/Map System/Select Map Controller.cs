@@ -35,12 +35,7 @@ public class SelectMapController : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Map Position : {mapController.transform.position}");
-        Debug.Log($"Spawn(Local) : {selectMap._spawnPos}");
-
         Vector3 spawnPos = mapController.transform.TransformPoint(selectMap._spawnPos);
-
-        Debug.Log($"Spawn(World) : {spawnPos}");
 
         _player.transform.position = spawnPos;
 
