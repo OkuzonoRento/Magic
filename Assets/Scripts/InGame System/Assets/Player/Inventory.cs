@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using BuffSystem.Core;
+
 #if UNITY_EDITOR
 using UnityEditor;
 
 [CustomEditor(typeof(Inventory), true)]
 public class InventoryEditor : Editor
 {
-    [Header("Editor")]
     private Item _addItem;
     public override void OnInspectorGUI()
     {
@@ -55,7 +56,6 @@ public class MyInventory
         _item = item;
         _itemImage = item.GetItemImage();
         _amount = item.GetAmount();
-
         _itemType = ItemType.Inventory;
     }
     public MyInventory(Item item, ItemType type)
@@ -77,8 +77,26 @@ public abstract class Inventory : ScriptableObject
     [Header("Inventory")]
     [SerializeField] private List<MyInventory> _inventory = new();
 
-    //public List<MyInventory> MyInventory { get => _inventory; }
     public MagicBaseData[] AttackData { get => _attackData; set => _attackData = value; }
+
+    // ★ ショップ突入時等にデバフに応じてスロットへ null をセット＆魔法をバックパックへ戻す
+    public void ApplyDisabledSlots(BuffHandler buffHandler)
+    {
+        if (buffHandler == null) return;
+
+        int disabledCount = buffHandler.GetDisabledSlotCount();
+        int activeSlotCount = Mathf.Max(0, _attackData.Length - disabledCount);
+
+        for (int i = activeSlotCount; i < _attackData.Length; i++)
+        {
+            if (_attackData[i] != null)
+            {
+                // 装備されていた魔法をインベントリに戻す
+                AddInventory(_attackData[i]);
+                _attackData[i] = null; // スロットを null（無効）にする
+            }
+        }
+    }
 
     public void AddInventory(Item inventory)
     {
@@ -135,24 +153,28 @@ public abstract class Inventory : ScriptableObject
     public void ChangeInventory(int dragIndex, int dropIndex)
     {
         if (dragIndex < 0 || dragIndex >= _inventory.Count) return;
-
         if (dropIndex < 0 || dropIndex >= _inventory.Count) return;
 
         MyInventory oldItem = _inventory[dragIndex];
-
         _inventory[dragIndex] = _inventory[dropIndex];
-
         _inventory[dropIndex] = oldItem;
     }
 
-    public void InventoryToAttack(int dragIndex, int dropIndex)
+    public void InventoryToAttack(int dragIndex, int dropIndex, BuffHandler buffHandler = null)
     {
         dropIndex -= 30;
+
+        // ★ 封印されているスロット（null固定枠）へのドラッグ受け入れをガード
+        if (buffHandler != null)
+        {
+            int disabledCount = buffHandler.GetDisabledSlotCount();
+            int activeSlotCount = Mathf.Max(0, _attackData.Length - disabledCount);
+            if (dropIndex >= activeSlotCount) return;
+        }
 
         if (_inventory[dragIndex]._item is not MagicBaseData) return;
 
         MagicBaseData inventoryMagic = (MagicBaseData)_inventory[dragIndex]._item;
-
         MagicBaseData oldAttackMagic = _attackData[dropIndex];
 
         _attackData[dropIndex] = inventoryMagic;
@@ -164,9 +186,7 @@ public abstract class Inventory : ScriptableObject
         else
         {
             MyInventory oldItem = new MyInventory(oldAttackMagic, MyInventory.ItemType.Inventory);
-
             oldItem._count = 1;
-
             _inventory[dragIndex] = oldItem;
         }
     }
@@ -181,7 +201,6 @@ public abstract class Inventory : ScriptableObject
         if (_inventory[dropIndex]._item is not MagicBaseData inventoryMagic) return;
 
         MagicBaseData attackMagic = _attackData[dragIndex];
-
         _attackData[dragIndex] = inventoryMagic;
 
         MyInventory newItem = new MyInventory(attackMagic, MyInventory.ItemType.Inventory);
@@ -191,9 +210,18 @@ public abstract class Inventory : ScriptableObject
         _inventory[dropIndex] = newItem;
     }
 
-    public void AttackSlotChange(int dragIndex, int dropIndex)
+    public void AttackSlotChange(int dragIndex, int dropIndex, BuffHandler buffHandler = null)
     {
         dragIndex -= 30; dropIndex -= 30;
+
+        // ★ 封印枠とのスロット入れ替えをガード
+        if (buffHandler != null)
+        {
+            int disabledCount = buffHandler.GetDisabledSlotCount();
+            int activeSlotCount = Mathf.Max(0, _attackData.Length - disabledCount);
+            if (dragIndex >= activeSlotCount || dropIndex >= activeSlotCount) return;
+        }
+
         MagicBaseData dragItem = _attackData[dragIndex];
         _attackData[dragIndex] = _attackData[dropIndex];
         _attackData[dropIndex] = dragItem;

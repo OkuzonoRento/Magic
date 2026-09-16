@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 namespace BuffSystem.Core
@@ -6,8 +6,13 @@ namespace BuffSystem.Core
     public class BuffHandler : MonoBehaviour
     {
         private Dictionary<BuffData, int> _activeBuffs = new Dictionary<BuffData, int>();
+        private IDamageble _damageable;
 
-        // ƒoƒt‚Ì•t—^
+        private void Awake()
+        {
+            _damageable = GetComponent<IDamageble>();
+        }
+
         public void AddBuff(BuffData buff)
         {
             if (buff == null) return;
@@ -25,8 +30,8 @@ namespace BuffSystem.Core
             }
         }
 
-        // w’èƒXƒe[ƒ^ƒXID‚ÌÅI”{—¦‚ğŒvZ
-        public float GetStatMultiplier(string statId)
+        // ä¸€èˆ¬çš„ãªã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹å€ç‡ã®è¨ˆç®—
+        public float GetStatMultiplier(string statId, float currentHpRatio = 1.0f)
         {
             float multiplier = 1.0f;
 
@@ -35,16 +40,80 @@ namespace BuffSystem.Core
                 BuffData buff = pair.Key;
                 int stackCount = pair.Value;
 
+                // è‡ªå‚·ãƒãƒ•ã®HPä½ä¸‹ã«ã‚ˆã‚‹æ”»æ’ƒåŠ›ãƒšãƒŠãƒ«ãƒ†ã‚£
+                if (buff.IsSelfDamageBuff && currentHpRatio <= buff.StopSelfDamageHpThreshold)
+                {
+                    if (statId == "Attack")
+                    {
+                        multiplier += buff.DebuffPenaltyValue * stackCount;
+                        continue;
+                    }
+                }
+
                 if (buff.TargetStatId == statId)
                 {
                     multiplier += buff.Value * stackCount;
                 }
             }
 
-            return Mathf.Max(0.05f, multiplier); // Å’á’lƒK[ƒh
+            return Mathf.Max(0.01f, multiplier);
         }
 
-        // ƒ}ƒbƒvŒÀ’èƒoƒt‚ÌÁ‹
+        // ç¢ºç‡ä¸ç™ºï¼ˆFailChanceï¼‰ã®åˆ¤å®šï¼ˆ0.0ã€œ1.0ï¼‰
+        public bool ShouldFailAction()
+        {
+            float failChance = 0f;
+            foreach (var pair in _activeBuffs)
+            {
+                if (pair.Key.TargetStatId == "FailChance")
+                {
+                    failChance += pair.Key.Value * pair.Value;
+                }
+            }
+
+            if (failChance <= 0f) return false;
+            return Random.value < failChance;
+        }
+
+        // è¢«ãƒ€ãƒ¡ãƒ¼ã‚¸å€ç‡ã®è¨ˆç®—
+        public float GetDamageTakenMultiplier()
+        {
+            return GetStatMultiplier("DamageTaken");
+        }
+
+        // æ”»æ’ƒä¸å¯ã‚¹ãƒ­ãƒƒãƒˆæ•°ã®è¨ˆç®—
+        public int GetDisabledSlotCount()
+        {
+            int disabledSlots = 0;
+            foreach (var pair in _activeBuffs)
+            {
+                if (pair.Key.TargetStatId == "DisabledSlots")
+                {
+                    disabledSlots += Mathf.RoundToInt(pair.Key.Value) * pair.Value;
+                }
+            }
+            return disabledSlots;
+        }
+
+        // è‡ªå‚·å‡¦ç†
+        public void TriggerSelfDamage(int currentHp, int maxHp)
+        {
+            float hpRatio = (float)currentHp / maxHp;
+
+            foreach (var pair in _activeBuffs)
+            {
+                BuffData buff = pair.Key;
+                if (buff.IsSelfDamageBuff && hpRatio > buff.StopSelfDamageHpThreshold)
+                {
+                    int damage = Mathf.Max(1, Mathf.RoundToInt(maxHp * buff.SelfDamagePercent * pair.Value));
+                    if (_damageable != null)
+                    {
+                        _damageable.AddDamage(damage);
+                    }
+                }
+            }
+        }
+
         public void ClearMapBuffs()
         {
             List<BuffData> toRemove = new List<BuffData>();
@@ -62,7 +131,6 @@ namespace BuffSystem.Core
             }
         }
 
-        // ‘Sƒoƒt‚ÌÁ‹i€–SEƒƒCƒ“ƒƒjƒ…[ˆÚ“®j
         public void ClearAllBuffs()
         {
             _activeBuffs.Clear();

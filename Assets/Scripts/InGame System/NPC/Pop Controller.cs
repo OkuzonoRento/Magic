@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
+using BuffSystem.Core;
 
 public class PopController : MonoBehaviour
 {
@@ -16,7 +17,6 @@ public class PopController : MonoBehaviour
     {
         if (_selectMap == null || _mapController == null || _mapController.MapArea == null) return;
 
-        // 1. 先にリストから削除済みの参照（null）をクリーンアップ
         for (int i = _popLists.Count - 1; i >= 0; i--)
         {
             if (_popLists[i] == null)
@@ -25,7 +25,6 @@ public class PopController : MonoBehaviour
             }
         }
 
-        // 2. 足りない分だけ生成
         if (_selectMap._popCount > _popLists.Count)
         {
             int popCount = _selectMap._popCount - _popLists.Count;
@@ -51,18 +50,16 @@ public class PopController : MonoBehaviour
         {
             Vector3 randomPos = new Vector3(
                 Random.Range(bounds.min.x, bounds.max.x),
-                _player.transform.position.y, // プレイヤーのY座標基準に設定するとSamplePositionが成功しやすい
+                _player.transform.position.y,
                 Random.Range(bounds.min.z, bounds.max.z)
             );
 
-            // プレイヤーに近すぎたらやり直し（retryをしっかりインクリメント）
             if (_player != null && Vector3.Distance(randomPos, _player.transform.position) < _popDistance)
             {
                 retry++;
                 continue;
             }
 
-            // NavMesh上か確認
             if (NavMesh.SamplePosition(randomPos, out hit, 10f, NavMesh.AllAreas))
             {
                 pos = hit.position;
@@ -79,9 +76,11 @@ public class PopController : MonoBehaviour
             return;
         }
 
-        // 位置が決まってからInstantiateを行う
         GameObject popObj = Instantiate(target, pos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
         _popLists.Add(popObj);
+
+        // 敵へのバフ自動適用
+        InGameBuffManager.ApplyBuffsToEnemy(popObj);
     }
 
     public void Initialize(MapData mapData, MapController mapController)

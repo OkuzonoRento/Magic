@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using BuffSystem.Core;
 
 public class PlayerController : MonoBehaviour, IDamageble
 {
@@ -19,10 +20,10 @@ public class PlayerController : MonoBehaviour, IDamageble
     private Rigidbody _rb;
     private Vector3 _move;
     private Vector3 _moveForward;
-    [SerializeField] private int _maxHp = 100;
+    [SerializeField] private int _baseMaxHp = 100;
+    private int _maxHp;
     private int _hp;
     [SerializeField] private float _maxMoveSpeed = 5f;
-    private float _moveSpeed;
     [SerializeField] private float _turnTimeRate = 5.0f;
     private CameraController _cameraScript;
     [SerializeField] private Transform _magicParent;
@@ -31,17 +32,18 @@ public class PlayerController : MonoBehaviour, IDamageble
     [SerializeField] private Inventory _inventory;
     [SerializeField] private MyAttack[] _myAttack = new MyAttack[3];
 
-    // 同一魔法が連射されるのを防ぐための最小インターバル（秒）
     [SerializeField] private float _sameMagicInterval = 0.2f;
-
-    // 同一魔法の最終発射時刻を記録する辞書
     private Dictionary<MagicBaseData, float> _lastCastTimes = new Dictionary<MagicBaseData, float>();
+
+    private BuffHandler _buffHandler;
 
     public MyAttack[] GetMyAttack => _myAttack;
 
     private void Awake()
     {
         Application.targetFrameRate = 60;
+        _buffHandler = GetComponent<BuffHandler>();
+        if (_buffHandler == null) _buffHandler = gameObject.AddComponent<BuffHandler>();
     }
 
     private void Start()
@@ -54,8 +56,10 @@ public class PlayerController : MonoBehaviour, IDamageble
             _cameraScript = Camera.main.GetComponent<CameraController>();
         }
 
+        // 最大HPの補正
+        float hpMult = _buffHandler.GetStatMultiplier("MaxHP");
+        _maxHp = Mathf.RoundToInt(_baseMaxHp * hpMult);
         _hp = _maxHp;
-        _moveSpeed = _maxMoveSpeed;
 
         if (_hpUI != null)
         {
@@ -68,7 +72,6 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     private void Update()
     {
-        // 攻撃タイマーの更新（DeltaTimeで正確にカウント）
         for (int c = 0; c < _myAttack.Length; c++)
         {
             if (_myAttack[c]._attackData != null)
@@ -79,7 +82,6 @@ public class PlayerController : MonoBehaviour, IDamageble
 
         Move();
 
-        // 攻撃判定
         if (_cameraScript != null && _cameraScript._rock)
         {
             Atack();
@@ -88,7 +90,6 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     private void FixedUpdate()
     {
-        // 物理回転処理
         if (_cameraScript != null && _cameraScript._rock && _cameraScript._rockonTarget != null)
         {
             Vector3 dir = _cameraScript._rockonTarget.transform.position - transform.position;
@@ -104,7 +105,6 @@ public class PlayerController : MonoBehaviour, IDamageble
             Rotation();
         }
 
-        // HPバー更新
         if (_hpUI != null)
         {
             _hpUI.value = _hp;
@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour, IDamageble
                 _myAttack[c]._attackMaxCooltime = _myAttack[c]._attackData.GetMagicCoolTime();
                 _myAttack[c]._attackInstantiate = _myAttack[c]._attackData.GetInstantiate();
                 _myAttack[c]._attackCooltime = 0.0f;
-                _myAttack[c]._attackTimer = _myAttack[c]._attackMaxCooltime; // 初回即時発射可能に設定
+                _myAttack[c]._attackTimer = _myAttack[c]._attackMaxCooltime;
             }
             else
             {
@@ -137,13 +137,16 @@ public class PlayerController : MonoBehaviour, IDamageble
     {
         if (Camera.main == null) return;
 
+        float speedMult = _buffHandler.GetStatMultiplier("MoveSpeed");
+        float currentSpeed = _maxMoveSpeed * speedMult;
+
         Vector3 cameraForward = Vector3.Scale(Camera.main.transform.forward, new Vector3(1, 0, 1)).normalized;
         _moveForward = cameraForward * _move.z + Camera.main.transform.right * _move.x;
         _moveForward = _moveForward.normalized;
 
         if (_move.magnitude > 0)
         {
-            _rb.linearVelocity = _moveForward * _moveSpeed * _move.magnitude + new Vector3(0, _rb.linearVelocity.y, 0);
+            _rb.linearVelocity = _moveForward * currentSpeed * _move.magnitude + new Vector3(0, _rb.linearVelocity.y, 0);
         }
         else
         {
@@ -164,34 +167,43 @@ public class PlayerController : MonoBehaviour, IDamageble
     {
         for (int c = 0; c < _myAttack.Length; c++)
         {
+            // データが null の場合は発射しない（ショップで代入された null で自動回避）
             MagicBaseData currentData = _myAttack[c]._attackData;
             if (currentData == null) continue;
 
-            // 1. 各スロットの個別クールタイムチェック
-            if (_myAttack[c]._attackTimer >= _myAttack[c]._attackMaxCooltime)
+            float cdMult = _buffHandler.GetStatMultiplier("Cooldown");
+            float finalCooltime = _myAttack[c]._attackMaxCooltime * cdMult;
+
+            if (_myAttack[c]._attackTimer >= finalCooltime)
             {
-                // 2. 同一魔法の連続/同時発射防止チェック
                 if (_lastCastTimes.TryGetValue(currentData, out float lastCastTime))
                 {
                     if (Time.time - lastCastTime < _sameMagicInterval)
                     {
-                        // 前の同一魔法から時間が経っていないため発射を見送る
                         continue;
                     }
+                }
+
+                _myAttack[c]._attackTimer = 0f;
+                _lastCastTimes[currentData] = Time.time;
+
+                // 確率不発の判定
+                if (_buffHandler.ShouldFailAction())
+                {
+                    Debug.Log("魔法が不発に終わりました。");
+                    continue;
                 }
 
                 GameObject attackObject = currentData.GetMagicParticle();
                 if (attackObject == null || _myAttack[c]._attackInstantiate == null) continue;
 
-                // タイマーのリセットと最終発射時刻の記録
-                _myAttack[c]._attackTimer = 0f;
-                _lastCastTimes[currentData] = Time.time;
+                // 自傷処理
+                _buffHandler.TriggerSelfDamage(_hp, _maxHp);
 
                 Transform targetTransform = (_cameraScript != null && _cameraScript._rockonTarget != null)
                     ? _cameraScript._rockonTarget.transform
                     : null;
 
-                // 魔法の生成
                 _myAttack[c]._attackInstantiate.MagicInstantiate(
                     attackObject,
                     transform.position,
@@ -227,6 +239,9 @@ public class PlayerController : MonoBehaviour, IDamageble
 
     public void AddDamage(int damage)
     {
-        _hp = Mathf.Max(0, _hp - damage);
+        float takenMult = _buffHandler.GetDamageTakenMultiplier();
+        int finalDamage = Mathf.Max(1, Mathf.RoundToInt(damage * takenMult));
+
+        _hp = Mathf.Max(0, _hp - finalDamage);
     }
 }
