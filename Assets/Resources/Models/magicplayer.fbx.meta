@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 168f7174efe956947a76d9d43296c8d4
+guid: cbc3bec7dcc4cfd42a4ae6a13544ea96
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -8,17 +8,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: body_mat
-    second: {fileID: 2100000, guid: 9c464a7f88fe17949a55f5929d36db83, type: 2}
+    second: {fileID: 2100000, guid: ea9496b803b0cda4f8109a540b464e98, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: ohter_mat
-    second: {fileID: 2100000, guid: 4b98d4a4b6b6e84498b72dc74cda0acf, type: 2}
+    second: {fileID: 2100000, guid: f245a0ffd37fb8b44915a0f8bc1e2d54, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: robe
-    second: {fileID: 2100000, guid: 2fa259e81b0fabc40a4cc63683124b5f, type: 2}
+    second: {fileID: 2100000, guid: a0ac7577e192aab4e80a3e6661c9e8b6, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5af98fc3a41caa4ea0674c9bc847acf, type: 3}
+  m_Name: Gburin Data
+  m_EditorClassIdentifier: Assembly-CSharp::MagicRogue.EnemyData
+  enemyName: 
+  maxHp: 25
+  moveSpeed: 5
+  sightRange: 10
+  sightAngle: 150
+  sightRangeColor: {r: 0, g: 1, b: 0, a: 0.2}
+  attackPatterns:
+  - attackName: "\u3053\u3093\u68D2\u30B9\u30A4\u30F3\u30B0"
+    attackType: 0
+    damage: 5
+    attackCooldown: 2
+    animationTriggerName: attack_1
+    minAttackRange: 0
+    maxAttackRange: 4
+    attackAngle: 120
+    impactRadius: 0
+    projectileSpeed: 0
+    telegraphedDelay: 0
+    projectilePrefab: {fileID: 0}
+    attackRangeColor: {r: 1, g: 0.2, b: 0.2, a: 0.25}
+  - attackName: "\u3053\u3093\u68D2\u632F\u308A\u4E0B\u308D\u3057"
+    attackType: 0
+    damage: 8
+    attackCooldown: 3
+    animationTriggerName: attack_2
+    minAttackRange: 0
+    maxAttackRange: 6
+    attackAngle: 40
+    impactRadius: 0
+    projectileSpeed: 0
+    telegraphedDelay: 0
+    projectilePrefab: {fileID: 0}
+    attackRangeColor: {r: 1, g: 0.5, b: 0, a: 0.25}
+  dropList:
+  - item: {fileID: 11400000, guid: fc4e7d5fd79f79a418d6c41d330ff125, type: 2}
+    dropChance: 0.7
+  - item: {fileID: 11400000, guid: 7a05847795fca6d4fa3243f1c2feffc1, type: 2}
+    dropChance: 0.1

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a11d13c00f6712c46be4619bc32a8f98
+guid: a1ab6b7570c6c1e4dab4eb4fbf8aeed5
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: core_mat
-    second: {fileID: 2100000, guid: 957ca21610861b846bed6d378f8c5220, type: 2}
+    second: {fileID: 2100000, guid: a279c872c5f2a3f4a849d0c3960a334f, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: ohter_mat
-    second: {fileID: 2100000, guid: 4b98d4a4b6b6e84498b72dc74cda0acf, type: 2}
+    second: {fileID: 2100000, guid: 7e51e99d709faa747a89c2b577aa0075, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -40,7 +40,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1

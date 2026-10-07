@@ -5,19 +5,17 @@ TagManager:
   serializedVersion: 3
   tags:
   - Enemy
-  - Magic
+  - Environment
   - Wall
-  - Item
-  - Scene Manager
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - Enemy
-  - Item
+  - 
   - 
   - 
   - 
