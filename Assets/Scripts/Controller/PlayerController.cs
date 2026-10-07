@@ -57,7 +57,10 @@ namespace MagicRogue
         [SerializeField] private InventorySO inventory;
         [SerializeField] private Transform castPoint;
         [SerializeField] private Animator animator;
-        [SerializeField] private DamageFlash damageFlash; // ★ 追加
+        [SerializeField] private DamageFlash damageFlash;
+
+        [Header("UI参照")]
+        [SerializeField] private HealthBarUI healthBarUI; // ★ HPゲージアニメーションUI
 
         [Header("デバッグ表示")]
         [SerializeField] private float currentHp;
@@ -91,7 +94,7 @@ namespace MagicRogue
             buffHandler = GetComponent<BuffHandler>();
             targetLockSystem = GetComponent<TargetLockSystem>();
             if (animator == null) animator = GetComponentInChildren<Animator>();
-            if (damageFlash == null) damageFlash = GetComponent<DamageFlash>(); // ★ 自動取得
+            if (damageFlash == null) damageFlash = GetComponent<DamageFlash>();
 
             if (inventory != null)
             {
@@ -107,6 +110,12 @@ namespace MagicRogue
             }
 
             currentHp = MaxHp;
+
+            // ★ HPゲージUIの初期化（最大HPと現在HPをセット）
+            if (healthBarUI != null)
+            {
+                healthBarUI.Initialize(MaxHp, currentHp);
+            }
         }
 
         private void Update()
@@ -347,6 +356,12 @@ namespace MagicRogue
             float finalDamage = Mathf.Max(1f, damageAmount * damageMult);
 
             currentHp -= finalDamage;
+
+            // ★ ダメージUIの更新を呼ぶ (HealthBarUI 経由で Lerp アニメーション)
+            if (healthBarUI != null)
+            {
+                healthBarUI.UpdateHealth(currentHp);
+            }
 
             // ★ ダメージ点滅演出を再生
             if (damageFlash != null)
