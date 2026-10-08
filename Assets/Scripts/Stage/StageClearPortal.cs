@@ -6,6 +6,9 @@ namespace MagicRogue
     [RequireComponent(typeof(Collider))]
     public class StageClearPortal : MonoBehaviour
     {
+        [Header("クリア時設定")]
+        [SerializeField] private int stageClearGold = 100; // クリア獲得ゴールド
+
         private bool isTriggered = false;
 
         private void OnTriggerEnter(Collider other)
@@ -21,8 +24,12 @@ namespace MagicRogue
                 playerController.SetControlActive(false);
             }
 
-            // ★ GameSceneManager 経由で Fade 遷移してショップへ
-            if (GameSceneManager.Instance != null)
+            // ★ ResultUI があればクリアリザルト表示、なければ直でショップへ
+            if (ResultUI.Instance != null)
+            {
+                ResultUI.Instance.OnEnterPortal(stageClearGold);
+            }
+            else if (GameSceneManager.Instance != null)
             {
                 GameSceneManager.Instance.OnStageCleared();
             }

@@ -37,6 +37,7 @@ namespace MagicRogue
         [SerializeField] private float maxZoomMultiplier = 1.6f;
 
         private float currentYaw = 0f; // カメラの横回転角度（Y軸）
+        private PlayerController playerController;
 
         private void Start()
         {
@@ -46,18 +47,20 @@ namespace MagicRogue
                 if (playerObj != null) player = playerObj.transform;
             }
 
-            if (targetLockSystem == null && player != null)
+            if (player != null)
             {
-                targetLockSystem = player.GetComponent<TargetLockSystem>();
+                playerController = player.GetComponent<PlayerController>();
+                if (targetLockSystem == null) targetLockSystem = player.GetComponent<TargetLockSystem>();
             }
 
-            // 初期角度をカメラのY軸回転に合わせてセット
             currentYaw = transform.eulerAngles.y;
         }
 
         private void LateUpdate()
         {
-            if (player == null) return;
+            // ★ 修正：Time.timeScale <= 0 に加え、プレイヤーが存在しない・または操作不能（死亡時含む）な場合はカメラ操作をスキップ
+            if (player == null || Time.timeScale <= 0f) return;
+            if (playerController != null && !playerController.IsControlActive) return; // プロパティを追加して判定
 
             // 1. マウスの横移動（Mouse X）による横回転（Yaw）の計算
             var mouse = Mouse.current;

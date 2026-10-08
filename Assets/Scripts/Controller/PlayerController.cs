@@ -69,6 +69,8 @@ namespace MagicRogue
         public InventorySO Inventory => inventory;
         public float CurrentHp => currentHp;
 
+        public bool IsControlActive => isControlActive;
+
         public float MaxHp
         {
             get
@@ -381,6 +383,30 @@ namespace MagicRogue
         private void OnDeath()
         {
             Debug.Log("[Player] 死亡しました。");
+
+            SetControlActive(false);
+
+            // ★ 追加: 移動速度や物理挙動を即座に停止
+            if (characterController != null)
+            {
+                characterController.enabled = false; // 移動コンポーネントを無効化
+            }
+
+            // ★ 追加: 死亡アニメーションの発動（Animatorがある場合）
+            if (animator != null)
+            {
+                animator.SetTrigger("Die"); // ※死亡トリガー名に合わせて調整してください
+            }
+
+            // ResultUI の呼び出し
+            if (ResultUI.Instance != null)
+            {
+                int killCount = 0;
+                float surviveTime = Time.timeSinceLevelLoad;
+                int earnedGold = inventory != null ? inventory.coins : 0;
+
+                ResultUI.Instance.ShowDeathResult(killCount, surviveTime, earnedGold);
+            }
         }
 
         /// <summary>
