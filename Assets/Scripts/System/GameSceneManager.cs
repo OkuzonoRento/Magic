@@ -38,6 +38,10 @@ namespace MagicRogue
         [SerializeField] private List<BuffData> selectedMapBuffs = new List<BuffData>();
         [SerializeField] private string selectedMapName;
 
+        // ★ シーンを跨いで保持するプレイヤーのHPデータ
+        public float PlayerCurrentHp { get; set; } = -1f;
+        public bool IsHpInitialized { get; set; } = false;
+
         public MapData SelectedMapData { get; private set; }
         public int CurrentPhase { get; private set; } = 1;
         public int CurrentStageIndex { get; private set; } = 1;
@@ -78,6 +82,10 @@ namespace MagicRogue
             selectedMapBuffs.Clear();
             selectedMapName = string.Empty;
             SelectedMapData = null;
+
+            // ★ 新規ゲーム開始時にHP保存情報をリセット
+            IsHpInitialized = false;
+            PlayerCurrentHp = -1f;
 
             ChangeSceneWithFade(globalBuffSelectSceneName);
         }

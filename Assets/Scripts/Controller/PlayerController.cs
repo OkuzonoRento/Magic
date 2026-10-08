@@ -111,9 +111,36 @@ namespace MagicRogue
                 GameSceneManager.Instance.ApplyAllBuffsToPlayer(buffHandler);
             }
 
-            currentHp = MaxHp;
+            // ★ HPの引き継ぎ & 2割回復処理
+            if (GameSceneManager.Instance != null && GameSceneManager.Instance.IsHpInitialized)
+            {
+                // 前ステージの残りHPを取得
+                float previousHp = GameSceneManager.Instance.PlayerCurrentHp;
 
-            // ★ HPゲージUIの初期化（最大HPと現在HPをセット）
+                // 最大HPの2割（20%）を計算して回復
+                float healAmount = MaxHp * 0.2f;
+                float recoveredHp = previousHp + healAmount;
+
+                // 最大HPを超えないように制限してセット
+                currentHp = Mathf.Clamp(recoveredHp, 1f, MaxHp);
+
+                // 回復後のHPを GameSceneManager にも反映
+                GameSceneManager.Instance.PlayerCurrentHp = currentHp;
+
+                Debug.Log($"[Player] 2Map目移行: 残りHP({previousHp}) + 2割回復({healAmount}) = 現在HP({currentHp})");
+            }
+            else
+            {
+                // ゲーム初回開始時：全回復でスタート
+                currentHp = MaxHp;
+                if (GameSceneManager.Instance != null)
+                {
+                    GameSceneManager.Instance.PlayerCurrentHp = currentHp;
+                    GameSceneManager.Instance.IsHpInitialized = true;
+                }
+            }
+
+            // ★ HPゲージUIの初期化
             if (healthBarUI != null)
             {
                 healthBarUI.Initialize(MaxHp, currentHp);
@@ -359,7 +386,13 @@ namespace MagicRogue
 
             currentHp -= finalDamage;
 
-            // ★ ダメージUIの更新を呼ぶ (HealthBarUI 経由で Lerp アニメーション)
+            // 被弾のたびに最新のHPをマネージャーへ同期
+            if (GameSceneManager.Instance != null)
+            {
+                GameSceneManager.Instance.PlayerCurrentHp = currentHp;
+            }
+
+            // ★ ダメージUIの更新を呼ぶ
             if (healthBarUI != null)
             {
                 healthBarUI.UpdateHealth(currentHp);
@@ -386,19 +419,16 @@ namespace MagicRogue
 
             SetControlActive(false);
 
-            // ★ 追加: 移動速度や物理挙動を即座に停止
             if (characterController != null)
             {
-                characterController.enabled = false; // 移動コンポーネントを無効化
+                characterController.enabled = false;
             }
 
-            // ★ 追加: 死亡アニメーションの発動（Animatorがある場合）
             if (animator != null)
             {
-                animator.SetTrigger("Die"); // ※死亡トリガー名に合わせて調整してください
+                animator.SetTrigger("Die");
             }
 
-            // ResultUI の呼び出し
             if (ResultUI.Instance != null)
             {
                 int killCount = 0;
@@ -409,9 +439,6 @@ namespace MagicRogue
             }
         }
 
-        /// <summary>
-        /// ★ 追加: クールダウンの進行度割合 (1.0 = 発動直後/最大CD, 0.0 = 完了/発動可能) を取得する
-        /// </summary>
         public float GetCooldownProgress(int slotIndex)
         {
             if (inventory == null || inventory.spellSlots == null) return 0f;
