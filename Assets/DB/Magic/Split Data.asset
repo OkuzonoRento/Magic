@@ -29,6 +29,8 @@ MonoBehaviour:
   projectilePrefab: {fileID: 2334295758925942186, guid: a269b04d45178aa40b70516151957723, type: 3}
   projectileCount: 5
   spreadAngle: 70
+  homingDelay: 0.2
+  homingDuration: 2
   maxSplitCount: 2
   splitSubProjectiles: 4
   laserDamageInterval: 0.2
