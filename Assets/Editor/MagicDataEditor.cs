@@ -16,7 +16,6 @@ namespace MagicRogue
             EditorGUILayout.PropertyField(serializedObject.FindProperty("itemName"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("icon"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("rarity"));
-            // ★ 追加: buyPrice の描画を追加
             EditorGUILayout.PropertyField(serializedObject.FindProperty("buyPrice"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("sellPrice"));
 
@@ -39,17 +38,25 @@ namespace MagicRogue
             EditorGUILayout.PropertyField(movementTypeProp);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("projectilePrefab"));
 
-            // 選択された MovementType に応じて必要なプロパティのみ描画
+            // 選択された MovementType に応じて動的に表示切替
             MovementType movementType = (MovementType)movementTypeProp.enumValueIndex;
 
             switch (movementType)
             {
                 case MovementType.Spread:
-                case MovementType.Homing:
                     EditorGUILayout.Space(5);
                     EditorGUILayout.LabelField("拡散・発射設定", EditorStyles.boldLabel);
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("projectileCount"));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("spreadAngle"));
+                    break;
+
+                case MovementType.Homing:
+                    EditorGUILayout.Space(5);
+                    EditorGUILayout.LabelField("追尾・発射設定", EditorStyles.boldLabel);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("projectileCount"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("spreadAngle"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("homingDelay"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("homingDuration"));
                     break;
 
                 case MovementType.Split:
@@ -81,6 +88,7 @@ namespace MagicRogue
 
             // --- ビジュアル & 貫通 ---
             EditorGUILayout.LabelField("ビジュアル＆貫通設定", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("spellIcon"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("castEffectPrefab"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("hitEffectPrefab"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("castSound"));

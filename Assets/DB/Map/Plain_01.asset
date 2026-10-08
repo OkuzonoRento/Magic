@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Plain_01
   m_EditorClassIdentifier: Assembly-CSharp::MagicRogue.MapData
   mapType: 0
+  clearConditionType: 0
   mapName: Plain_01
   displayName: "\u5E73\u539F"
   model3DPrefab: {fileID: 5012261517174378115, guid: 101babc42f0e2a6458dcc4ae928c99f8, type: 3}
@@ -25,5 +26,7 @@ MonoBehaviour:
     spawnWeight: 40
   maxEnemyCount: 20
   spawnInterval: 3
-  targetKillCount: 30
+  targetSurviveTime: 60
+  timeReducePerKill: 3
+  targetKillCount: 10
   portalPrefab: {fileID: 5303257763230279889, guid: c9445cb972d48744eaaa75f565b0ce0a, type: 3}

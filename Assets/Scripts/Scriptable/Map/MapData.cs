@@ -15,6 +15,13 @@ namespace MagicRogue
         Boss    // ボス
     }
 
+    public enum ClearConditionType
+    {
+        KillCount,     // 規定数の敵撃破
+        SurviveTime,   // 一定時間生存（敵撃破で時間短縮）
+        BossDefeat     // ボス撃破
+    }
+
     [Serializable]
     public struct EnemySpawnConfig
     {
@@ -32,6 +39,9 @@ namespace MagicRogue
         [Header("マップ種別・選択画面用情報")]
         [Tooltip("マップの種別（Normal / Event / Boss）")]
         public MapType mapType = MapType.Normal;
+
+        [Tooltip("クリア条件のタイプ")]
+        public ClearConditionType clearConditionType = ClearConditionType.SurviveTime;
 
         [Tooltip("遷移先のシーン名・アセット名（例: Plain）")]
         public string mapName;
@@ -67,7 +77,13 @@ namespace MagicRogue
         public float spawnInterval = 3f;
 
         [Header("クリア・ポータル設定")]
-        [Tooltip("ステージクリアに必要な敵撃破数")]
+        [Tooltip("クリアに必要な目標生存時間（秒）")]
+        public float targetSurviveTime = 60f;
+
+        [Tooltip("敵を1体撃破した際に短縮される制限時間（秒）")]
+        public float timeReducePerKill = 3f;
+
+        [Tooltip("ステージクリアに必要な敵撃破数（KillCount条件用）")]
         public int targetKillCount = 15;
 
         [Tooltip("クリア時に出現するポータルのプレハブ")]

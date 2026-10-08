@@ -94,9 +94,9 @@ namespace MagicRogue
         /// </summary>
         private void MoveHoming()
         {
-            // 例: 生成から0.2秒間は直進（Wait時間）、0.2s〜2.0sの間だけ追尾、2.0s以降は直進
-            float homingDelay = 0.2f;
-            float homingDuration = 2.0f;
+            // MagicData から設定した待機時間(homingDelay)と継続時間(homingDuration)を取得
+            float homingDelay = magicData.homingDelay;
+            float homingDuration = magicData.homingDuration;
 
             if (elapsedTime >= homingDelay && elapsedTime < (homingDelay + homingDuration))
             {
@@ -134,7 +134,7 @@ namespace MagicRogue
             {
                 Vector3 returnDir = (playerTransform.position - transform.position).normalized;
 
-                // カクッとではなく、RotateTowardsで滑らかにプレイヤー方向へ向けて旋回
+                // RotateTowardsで滑らかにプレイヤー方向へ向けて旋回
                 moveDirection = Vector3.RotateTowards(moveDirection, returnDir, 6f * Time.deltaTime, 0f).normalized;
                 if (moveDirection != Vector3.zero)
                 {
@@ -241,7 +241,6 @@ namespace MagicRogue
 
         /// <summary>
         /// 命中時に周囲へ小弾を放射（Split挙動）
-        /// 当たった敵(hitEnemy)を除外指定して小弾を生成し、2回目以降の分裂(連鎖)では元のターゲットにも当たるようにする
         /// </summary>
         private void TriggerSplitProjectiles(GameObject hitEnemy)
         {
@@ -261,8 +260,6 @@ namespace MagicRogue
 
                 if (subObj.TryGetComponent<MagicProjectile>(out var subProj))
                 {
-                    // 当たった敵(hitEnemy)を除外対象として指定。
-                    // 次にさらに別の敵へ当たって2回目の分裂が起きた場合は、新しいhitEnemyが渡されるため「最初のターゲット」にも再び当たるようになります。
                     subProj.Setup(magicData, subDir, attackMultiplier * 0.5f, ownerPlayerBuffHandler, currentSplitCount + 1, hitEnemy);
                 }
             }

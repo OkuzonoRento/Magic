@@ -382,5 +382,29 @@ namespace MagicRogue
         {
             Debug.Log("[Player] 死亡しました。");
         }
+
+        /// <summary>
+        /// ★ 追加: クールダウンの進行度割合 (1.0 = 発動直後/最大CD, 0.0 = 完了/発動可能) を取得する
+        /// </summary>
+        public float GetCooldownProgress(int slotIndex)
+        {
+            if (inventory == null || inventory.spellSlots == null) return 0f;
+            if (slotIndex < 0 || slotIndex >= inventory.spellSlots.Length) return 0f;
+
+            MagicData magic = inventory.spellSlots[slotIndex];
+            if (magic == null) return 0f;
+
+            float cdMult = buffHandler != null ? buffHandler.GetMultiplier(BuffType.CooldownIncrease, BuffType.CooldownReduction) : 1f;
+            float maxCD = magic.cooldown * cdMult;
+
+            if (maxCD <= 0f) return 0f;
+
+            if (cooldownTimers.TryGetValue(slotIndex, out float remainingTimer) && remainingTimer > 0f)
+            {
+                return Mathf.Clamp01(remainingTimer / maxCD);
+            }
+
+            return 0f;
+        }
     }
 }

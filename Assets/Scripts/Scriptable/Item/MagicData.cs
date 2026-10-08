@@ -39,6 +39,12 @@ namespace MagicRogue
         [Tooltip("扇形の拡散角度（度）")]
         public float spreadAngle = 45f;
 
+        [Header("追尾設定（Homing）")]
+        [Tooltip("生成されてから追尾を開始するまでの待機時間（秒）")]
+        public float homingDelay = 0.2f;
+        [Tooltip("追尾を継続する時間（秒）。経過後は直進に戻ります")]
+        public float homingDuration = 2.0f;
+
         [Header("散弾設定（Split）")]
         [Tooltip("残り分裂可能回数（デフォルト2回）")]
         public int maxSplitCount = 2;
@@ -56,6 +62,9 @@ namespace MagicRogue
         public float returnSpeedMultiplier = 1.5f;
 
         [Header("ビジュアル＆エフェクト (VFX)")]
+        [Tooltip("UIスロット等に表示する魔法専用アイコンSprite")]
+        public Sprite spellIcon; // ★ 魔法専用アイコン
+
         public GameObject castEffectPrefab;
         public GameObject hitEffectPrefab;
         public AudioClip castSound;

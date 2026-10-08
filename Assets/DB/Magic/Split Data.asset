@@ -34,6 +34,7 @@ MonoBehaviour:
   laserDamageInterval: 0.2
   returnTime: 1
   returnSpeedMultiplier: 1.5
+  spellIcon: {fileID: 652651269, guid: eb651658b47e60548b88db9f2a0161f5, type: 3}
   castEffectPrefab: {fileID: 0}
   hitEffectPrefab: {fileID: 0}
   castSound: {fileID: 0}

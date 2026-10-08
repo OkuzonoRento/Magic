@@ -15,10 +15,10 @@ MonoBehaviour:
   itemId: 
   itemName: 
   icon: {fileID: -13713162, guid: 8b5dab85cc8b0c4418295c33e1cbb8ab, type: 3}
-  rarity: 2
+  rarity: 1
   customWorldModelPrefab: {fileID: 0}
-  buyPrice: 1700
-  sellPrice: 700
+  buyPrice: 1000
+  sellPrice: 500
   maxStackSize: 1
   damage: 1
   cooldown: 2.5
@@ -29,11 +29,14 @@ MonoBehaviour:
   projectilePrefab: {fileID: 94684462530363271, guid: 384942814981603408cd9da09bc593bb, type: 3}
   projectileCount: 6
   spreadAngle: 80
+  homingDelay: 0.2
+  homingDuration: 0.25
   maxSplitCount: 2
   splitSubProjectiles: 4
   laserDamageInterval: 0.2
   returnTime: 1
   returnSpeedMultiplier: 1.5
+  spellIcon: {fileID: 910818671, guid: eb651658b47e60548b88db9f2a0161f5, type: 3}
   castEffectPrefab: {fileID: 0}
   hitEffectPrefab: {fileID: 0}
   castSound: {fileID: 0}

@@ -29,8 +29,12 @@ namespace MagicRogue
         private readonly List<GameObject> activeEnemies = new List<GameObject>();
         private Coroutine spawnCoroutine;
 
+        private float remainingTime = 0f;
         private int currentKillCount = 0;
         private bool isPortalSpawned = false;
+
+        public float RemainingTime => remainingTime;
+        public int CurrentKillCount => currentKillCount;
 
         private void Awake()
         {
@@ -50,9 +54,25 @@ namespace MagicRogue
             InitializeSelectedMap();
         }
 
+        private void Update()
+        {
+            if (activeMap == null || activeMap.MapData == null) return;
+
+            // SurviveTime モードかつポータル未生成の場合のみ時間カウントダウン
+            if (!isPortalSpawned && activeMap.MapData.clearConditionType == ClearConditionType.SurviveTime)
+            {
+                remainingTime -= Time.deltaTime;
+
+                if (remainingTime <= 0f)
+                {
+                    remainingTime = 0f;
+                    TriggerClearPortal();
+                }
+            }
+        }
+
         private void InitializeSelectedMap()
         {
-            // ★【CS1061修正箇所】CurrentSaveData 経由ではなく SelectedMapData からマップ名を取得
             string selectedName = (GameSceneManager.Instance != null && GameSceneManager.Instance.SelectedMapData != null)
                 ? GameSceneManager.Instance.SelectedMapData.mapName
                 : string.Empty;
@@ -103,12 +123,17 @@ namespace MagicRogue
                 }
             }
 
-            // 2. 撃破カウント・リストの初期化
+            // 2. タイマー・撃破カウント・フラグ・敵リストの初期化
             currentKillCount = 0;
             isPortalSpawned = false;
             activeEnemies.Clear();
 
-            // 3. 敵スポーンルーチンの開始
+            if (activeMap != null && activeMap.MapData != null)
+            {
+                remainingTime = activeMap.MapData.targetSurviveTime;
+            }
+
+            // 3. 敵スポーンルーチンの開始（クリア後も継続してスポーンし続ける）
             if (spawnCoroutine != null) StopCoroutine(spawnCoroutine);
             if (activeMap != null && activeMap.MapData != null)
             {
@@ -121,18 +146,59 @@ namespace MagicRogue
         /// </summary>
         public void OnEnemyKilled()
         {
-            if (isPortalSpawned || activeMap == null || activeMap.MapData == null) return;
+            if (activeMap == null || activeMap.MapData == null) return;
 
             currentKillCount++;
-            Debug.Log($"[EnemySpawner] 撃破数: {currentKillCount} / {activeMap.MapData.targetKillCount}");
 
-            if (currentKillCount >= activeMap.MapData.targetKillCount)
+            if (!isPortalSpawned)
             {
-                isPortalSpawned = true;
+                var mapData = activeMap.MapData;
+
+                switch (mapData.clearConditionType)
+                {
+                    case ClearConditionType.KillCount:
+                        Debug.Log($"[EnemySpawner] 撃破数: {currentKillCount} / {mapData.targetKillCount}");
+                        if (currentKillCount >= mapData.targetKillCount)
+                        {
+                            TriggerClearPortal();
+                        }
+                        break;
+
+                    case ClearConditionType.SurviveTime:
+                        float reduceAmount = mapData.timeReducePerKill;
+                        remainingTime -= reduceAmount;
+
+                        Debug.Log($"[EnemySpawner] 敵撃破！ 残り時間 {reduceAmount} 秒短縮。 (残り: {Mathf.Max(0, remainingTime):F1} 秒 / 累計撃破: {currentKillCount})");
+
+                        if (remainingTime <= 0f)
+                        {
+                            remainingTime = 0f;
+                            TriggerClearPortal();
+                        }
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 条件達成時にポータルを生成する
+        /// </summary>
+        private void TriggerClearPortal()
+        {
+            if (isPortalSpawned) return;
+
+            isPortalSpawned = true;
+            Debug.Log("[EnemySpawner] クリア条件を達成しました！ クリアポータルが出現します。");
+
+            if (activeMap != null)
+            {
                 activeMap.SpawnClearPortal();
             }
         }
 
+        /// <summary>
+        /// 敵スポーンルーチン（ポータル出現後も止まらず、上限まで無限に補充し続ける）
+        /// </summary>
         private IEnumerator SpawnRoutine()
         {
             var mapData = activeMap.MapData;
@@ -143,12 +209,11 @@ namespace MagicRogue
             {
                 if (!TrySpawnEnemy(mapData))
                 {
-                    // 万が一NavMeshの位置取得に失敗し続ける場合は無限ループを防ぐため抜ける
                     break;
                 }
             }
 
-            // ★ 以降は指定のインターバルごとに欠員が出たら追加スポーン
+            // ★ クリア条件（ポータル出現）達成後も loop を抜けることなく、ずっと追加スポーンを継続する
             while (true)
             {
                 yield return new WaitForSeconds(mapData.spawnInterval);

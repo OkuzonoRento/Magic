@@ -37,7 +37,7 @@ namespace MagicRogue
         [SerializeField] private EnemyHealth enemyHealth;
         [SerializeField] private Animator animator;
         [SerializeField] private BuffHandler buffHandler;
-        [SerializeField] private DamageFlash damageFlash; // ★ 追加
+        [SerializeField] private DamageFlash damageFlash;
 
         private Transform targetPlayer;
         private EnemyState currentState = EnemyState.Patrol;
@@ -57,13 +57,33 @@ namespace MagicRogue
 
         public EnemyData Data => enemyData;
 
+        // ★ UI（StageProgressBarUI等）向けHP参照用プロパティ
+        public float MaxHp
+        {
+            get
+            {
+                if (enemyHealth != null) return enemyHealth.MaxHealth;
+                if (enemyData != null) return enemyData.maxHp;
+                return 100f;
+            }
+        }
+
+        public float CurrentHp
+        {
+            get
+            {
+                if (enemyHealth != null) return enemyHealth.CurrentHealth;
+                return 0f;
+            }
+        }
+
         private void Start()
         {
             if (agent == null) agent = GetComponent<NavMeshAgent>();
             if (enemyHealth == null) enemyHealth = GetComponent<EnemyHealth>();
             if (animator == null) animator = GetComponentInChildren<Animator>();
             if (buffHandler == null) buffHandler = GetComponent<BuffHandler>();
-            if (damageFlash == null) damageFlash = GetComponent<DamageFlash>(); // ★ 自動取得
+            if (damageFlash == null) damageFlash = GetComponent<DamageFlash>();
 
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
@@ -439,7 +459,6 @@ namespace MagicRogue
                 Die();
             }
 
-            // ★ ダメージ点滅演出を再生
             if (damageFlash != null)
             {
                 damageFlash.CallDamageFlash();
